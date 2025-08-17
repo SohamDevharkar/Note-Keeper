@@ -1,10 +1,14 @@
-import { useState, useEffect } from 'react';
-import './App.css'
+import { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Header } from './components/my-components/Header'
 import { SidebarBox } from './components/my-components/Sidebar'
 import { NoteView } from './pages/NoteView.jsx';
+import { ArchiveView } from './pages/ArchiveView.jsx';
+import { TrashView } from './pages/TrashView.jsx';
+
 
 function App() {
+
   const [sidebaropen, setSidebarOpen] = useState(false);
   const [notes, setNotes] = useState(() => {
     const noteList = sessionStorage.getItem('noteList')
@@ -12,26 +16,49 @@ function App() {
   });
   const [selectedNote, setSelectedNote] = useState(null);
   const [inputOpen, setInputOpen] = useState(false);
-  const [viewFilter, setViewFilter] = useState("notes");
-
-
-
-  return (
+  
+    return (
     <>
-      <div className='flex min-h-screen overflow-hidden'>
-        <Header sidebaropen={sidebaropen} setSidebarOpen={setSidebarOpen} view={viewFilter} />
+      <Router>
+        <div className='flex min-h-screen overflow-hidden'>
+          <Header sidebaropen={sidebaropen} setSidebarOpen={setSidebarOpen} />
 
-        <div className=''>
-          <SidebarBox sidebaropen={sidebaropen} setSidebarOpen={setSidebarOpen} view={viewFilter} setViewFilter={setViewFilter}/>
-        </div>
+          <div className=''>
+            <SidebarBox sidebaropen={sidebaropen} setSidebarOpen={setSidebarOpen}  />
+          </div>
 
-        <div className={`mt-16 w-full max-w-[1480px] flex-col  ${sidebaropen ? 'ml-56' : 'ml-16'} border-4 border-green-500 transition-all duration-300`}>
-          <NoteView notes={notes} 
-          inputOpen={inputOpen} setInputOpen={setInputOpen} 
-          sidebaropen={sidebaropen} setNotes={setNotes} viewFilter={viewFilter} 
-          setViewFilter={setViewFilter} />
+          <div className={`mt-16 w-full max-w-[1480px] flex-col  ${sidebaropen ? 'ml-56' : 'ml-16'} border-4 border-green-500 transition-all duration-300`}>
+            <Routes>
+
+              <Route path='/home' element={
+                <NoteView notes={notes}
+                  inputOpen={inputOpen} 
+                  setInputOpen={setInputOpen}
+                  sidebaropen={sidebaropen} 
+                  setNotes={setNotes} 
+                   />
+              } />
+
+              <Route path='/archive' element={
+                <ArchiveView notes={notes}
+                  sidebaropen={sidebaropen} 
+                  setNotes={setNotes} 
+                   />
+              } />
+
+              <Route path='/trash' element={
+                <TrashView notes={notes}
+                  inputOpen={inputOpen} 
+                  setInputOpen={setInputOpen}
+                  sidebaropen={sidebaropen} 
+                  setNotes={setNotes} 
+                   />
+              } />
+
+            </Routes>
+          </div>
         </div>
-      </div>
+      </Router>
     </>
   )
 }

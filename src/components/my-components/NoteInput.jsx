@@ -4,16 +4,12 @@ import { MdFormatColorText } from "react-icons/md";
 import { RiInboxArchiveLine } from "react-icons/ri";
 import { IoColorPaletteOutline } from "react-icons/io5";
 
-
 export const NoteInput = ({setNotes, inputOpen, setInputOpen}) => {
-    
-    let id = useRef();
-    
+        
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [showTipTapMenu, setShowTipTapMenu] = useState(false);
     
-
     const wrapperRef = useRef(null);
     const titleRef = useRef();
 
@@ -39,12 +35,10 @@ export const NoteInput = ({setNotes, inputOpen, setInputOpen}) => {
     }, [inputOpen, title, content,])
 
 
-
     function handleClose() {
         if(!title.trim() && !content.trim()) {
             setInputOpen(false);
         } else {
-
             addNote();
             setTitle("");
             setContent("");
@@ -59,17 +53,11 @@ export const NoteInput = ({setNotes, inputOpen, setInputOpen}) => {
             content: content,
             view: 'notes'
         }
-
         const existingNotes = JSON.parse(sessionStorage.getItem('noteList')) || [];
-
         const updatedNotes = [...existingNotes, newNote];
-
         sessionStorage.setItem('noteList', JSON.stringify(updatedNotes));
-
         setNotes(updatedNotes)
-        
-        console.log("Note saved: ", {id: id, title: title, content: content });
-            
+        console.log("Note saved: ", {id: id, title: title, content: content });  
     }
  
  /*className={` w-[600px] bg-red-500 flex flex-col mt-1 mx-[400px] rounded-sm shadow-2xl border z-20 note-expand${open ? ' open' : ''}`}*/  

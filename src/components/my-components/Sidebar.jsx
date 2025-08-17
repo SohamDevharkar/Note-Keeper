@@ -1,10 +1,8 @@
-import { useRef, useEffect, useState } from "react";
 import { LuNotebook } from "react-icons/lu";
 import { RiInboxArchiveLine } from "react-icons/ri";
 import { BsTrash } from "react-icons/bs";
-import { useMediaQuery } from "../../hooks/useMediaQuery";
-
-export const SidebarBox = ({ sidebaropen, setSidebarOpen, setViewFilter }) => {
+import { useNavigate } from "react-router-dom";
+export const SidebarBox = ({ sidebaropen}) => {
 
     // const isDesktop = useMediaQuery('(min-width: 979px)');
 
@@ -22,40 +20,24 @@ export const SidebarBox = ({ sidebaropen, setSidebarOpen, setViewFilter }) => {
             title: "Notes",
             icon: LuNotebook,
             view:'notes',
-            url: "#"
+            
         },
         {
             title: "Archive",
             icon: RiInboxArchiveLine,
             view:'archive',
-            url: "#"
+            
         },
         {
             title: "Trash",
             icon: BsTrash,
             view: 'trash',
-            url: "#"
+            
         },
         
     ]
 
-    function handleMouseEnter() {
-        // Only open if currently closed
-        if (!sidebarOpenRef.current) {
-            setSidebarOpen(true);
-            console.log("Sidebar opened");
-        }
-    }
-
-    function handleMouseLeave() {
-        // Only close if currently open
-        if (sidebarOpenRef.current) {
-            setSidebarOpen(false);
-            console.log("Sidebar closed");
-        }
-    }
-
-    
+    const navigate = useNavigate();   
 
     return (
         //new code
@@ -64,11 +46,10 @@ export const SidebarBox = ({ sidebaropen, setSidebarOpen, setViewFilter }) => {
             ease-in-out z-100 shadow-md  bg-white 
             ${sidebaropen ? 'w-56 ' : 'w-16 hover:w-56'}`}>
             {items.map((item) => {
-                // console.log(item);
+                const route = item.view === 'notes' ? '/home' : `/${item.view}`
                 return (
-                    <div key={item.title} onClick={(e)=>{
-                        e.preventDefault();
-                        setViewFilter(item.view)}}
+                    <div key={item.title} onClick={()=>{
+                        navigate(route)}}
                         className="flex items-center gap-4 px-4 py-3 border-2 
                         hover:bg-slate-200 rounded-xl h-14 relative 
                             transaction-all duration-300">

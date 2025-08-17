@@ -1,33 +1,28 @@
 import Masonry from 'react-masonry-css'
-import {Card } from './Card'
+import { Card } from './Card'
 
-export const NoteLayout = ({notes, setNotes, sidebaropen, view, setViewFilter}) => {
+export const NoteLayout = ({ filteredNotes, notes, setNotes, sidebaropen }) => {
 
-    const onMove = (id, targetView) => {
-        setNotes((note) => {
-            note.id === id ? {...note, view: targetView} : note
-        })
+    function handleNoteViewChange(noteId, targetView) {
+        const updatedNotes = notes.map((note) => {
+            if (noteId === note.id) {
+                const newView = note.view === targetView ? 'notes' : targetView;
+                return { ...note, view: newView };
+            }
+            return note;
+        });
+        console.log("Before updating noteList: " + JSON.stringify(notes));
+        setNotes(updatedNotes);
+        sessionStorage.setItem('noteList', JSON.stringify(updatedNotes));
+        console.log("updated note list: " + JSON.stringify(updatedNotes));
     }
 
-    const filteredNotes = notes.filter((note) => {
-        if(view === 'archived') {
-            return note.view === 'archived';
-        }
-        if(view === 'trash') {
-            return note.view === 'trash';
-        }
-        return note.view === 'notes'
-        
-    })
-
-    console.log("filteredNotes: " + filteredNotes)
-
     const breakpointColumnsObj = {
-        default: sidebaropen ? 5: 6,
+        default: sidebaropen ? 5 : 6,
         1630: sidebaropen ? 4 : 5,
-        1496: sidebaropen ?3 : 4,
-        1220: sidebaropen ?2 : 3,
-        937: sidebaropen ?1 : 2,
+        1496: sidebaropen ? 3 : 4,
+        1220: sidebaropen ? 2 : 3,
+        937: sidebaropen ? 1 : 2,
         640: 1,
     }
 
@@ -50,21 +45,19 @@ export const NoteLayout = ({notes, setNotes, sidebaropen, view, setViewFilter}) 
 
     return <div className={`w-full  min-h-[400px] `}>
         <Masonry breakpointCols={breakpointColumnsObj}
-                className="my-masonry-grid "
-                columnClassName="my-masonry-grid_column ">
-            {filteredNotes.reverse().map((note) => {
-            console.log('from app.jsx note: ' + note);
-            return (<div key={note.id}  >
-                        <Card id={note.id} title={note.title} 
-                            content={note.content} 
-                            bgColor="bg-red-200" 
-                            setViewFilter={setViewFilter}
+            className="my-masonry-grid "
+            columnClassName="my-masonry-grid_column ">
+            {
+                filteredNotes.reverse().map((note) => {
+                    return (<div key={note.id}  >
+                        <Card id={note.id} title={note.title}
+                            content={note.content}
+                            bgColor="bg-red-200"
+                            onViewChange={handleNoteViewChange}
                         />
                     </div>)
-                }
-            )
-        }
+                })
+            }
         </Masonry>
-
     </div>
 }

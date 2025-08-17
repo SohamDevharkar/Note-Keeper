@@ -5,14 +5,10 @@ import { FaStickyNote } from "react-icons/fa";
 import { MdArrowBack, MdOutlineGridView } from "react-icons/md";
 import { MdSettings } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
-import { useMediaQuery } from "../../hooks/useMediaQuery";
 
-
-export const Header = ({ sidebaropen, setSidebarOpen, viewFilter }) => {
+export const Header = ({ sidebaropen, setSidebarOpen, }) => {
 
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-    const isMobile = useMediaQuery('(min-width: 768px)')
-
 
     return (
         <header className="flex items-center justify-between h-16 w-full px-4 bg-background border-b gap-6 fixed top-0 left-0 right-0 z-50 shadow-sm">

@@ -4,7 +4,7 @@ export function FontSizeCounter({ editor, min = 8, max = 72, step = 1 }) {
     // Get the current font size from editor attributes (strip "px")
     const currentFontSizeRaw = editor.getAttributes('textStyle').fontSize || '';
     const currentFontSize =
-        currentFontSizeRaw ? parseInt(currentFontSizeRaw.replace('px', '')) : 16; // Default to 16
+        currentFontSizeRaw ? parseInt(currentFontSizeRaw.replace('px', '')) : 16; 
 
     // Internal state to allow onBlur confirmation/user typing
     const [fontSize, setFontSize] = useState(currentFontSize);

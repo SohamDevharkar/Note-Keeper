@@ -9,8 +9,6 @@ import { FiItalic } from "react-icons/fi";
 
 export function TipTapEditor({ value, onChange, placeholder, className, singleLine, showTipTapMenu }) {
 
-    const wrapperRef = useRef();
-
     const editor = useEditor({
         extensions: [StarterKit.configure({
             history: {
@@ -42,8 +40,6 @@ export function TipTapEditor({ value, onChange, placeholder, className, singleLi
             editor.commands.setContent(value)
         }
     }, [value, editor])
-    
-
 
     if (!editor) return null
     return (<div>
@@ -60,11 +56,7 @@ function Menubar({ editor }) {
         21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
         31, 32, 33, 34, 35, 36, 37, 38, 39, 40];
     
-    
-
     const currentFontSize = editor.getAttributes('textStyle').fontSize || '16px';
-
-
 
     return (
         <div className="flex gap-2 bg-white w-full  ">
@@ -117,9 +109,7 @@ function Menubar({ editor }) {
                     ))}
                 </select> */}
                 <FontSizeCounter editor={editor} min={8} max={40} step={1} />
-
             </div>
-
         </div>
     )
 }
