@@ -1,7 +1,17 @@
 import Masonry from 'react-masonry-css'
 import { Card } from './Card'
 
-export const NoteLayout = ({ filteredNotes, notes, setNotes, sidebaropen }) => {
+export const NoteLayout = ({
+    filteredNotes,
+    notes,
+    setNotes,
+    sidebaropen,
+    setSelectedNote }) => {
+
+
+    const openModal = (note) => {
+        setSelectedNote(note);
+    }
 
     function handleNoteViewChange(noteId, targetView) {
         const updatedNotes = notes.map((note) => {
@@ -54,6 +64,7 @@ export const NoteLayout = ({ filteredNotes, notes, setNotes, sidebaropen }) => {
                             content={note.content}
                             bgColor="bg-red-200"
                             onViewChange={handleNoteViewChange}
+                            onCardClick={() => openModal(note)}
                         />
                     </div>)
                 })

@@ -57,7 +57,7 @@ export const NoteInput = ({setNotes, inputOpen, setInputOpen}) => {
         const updatedNotes = [...existingNotes, newNote];
         sessionStorage.setItem('noteList', JSON.stringify(updatedNotes));
         setNotes(updatedNotes)
-        console.log("Note saved: ", {id: id, title: title, content: content });  
+        console.log("Note saved: ", {id: newNote.id, title: title, content: content });  
     }
  
  /*className={` w-[600px] bg-red-500 flex flex-col mt-1 mx-[400px] rounded-sm shadow-2xl border z-20 note-expand${open ? ' open' : ''}`}*/  

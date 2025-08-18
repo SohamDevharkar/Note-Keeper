@@ -59,7 +59,7 @@ function Menubar({ editor }) {
     const currentFontSize = editor.getAttributes('textStyle').fontSize || '16px';
 
     return (
-        <div className="flex gap-2 bg-white w-full  ">
+        <div className="flex px-5 gap-2 bg-white w-full   ">
             {/* Formatting (Bold as example; replace with dropdown for full menu) */}
             <button
                 title="Bold"

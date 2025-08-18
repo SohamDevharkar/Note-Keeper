@@ -6,6 +6,7 @@ export const NoteView = ({ sidebaropen,
   notes,
   setNotes,
   setInputOpen,
+  setSelectedNote
 }) => {
 
     const filteredNotes = notes.filter((note) => note.view === 'notes');
@@ -14,10 +15,12 @@ export const NoteView = ({ sidebaropen,
     <div className={`min-h-[80px] bg-orange-300 border-4 transition-all duration-100`}>
       <NoteInput notes={notes} setNotes={setNotes} inputOpen={inputOpen} setInputOpen={setInputOpen} />
     </div>
-    <div className={`relative border-4  p-2 border-purple-600 ${sidebaropen ? 'max-w-[1300px]' : 'max-w-screen'}  sm:w-full`}>
+    <div className={`border-4 p-2 border-purple-600 ${sidebaropen ? 'max-w-[1300px]' : 'max-w-screen'}  sm:w-full`}>
       <NoteLayout filteredNotes={filteredNotes} setNotes={setNotes} 
         sidebaropen={sidebaropen}
-        notes={notes}/>
+        notes={notes}
+        setSelectedNote={setSelectedNote}
+        />
     </div>
   </>)
 }

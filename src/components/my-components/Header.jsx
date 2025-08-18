@@ -11,7 +11,7 @@ export const Header = ({ sidebaropen, setSidebarOpen, }) => {
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
     return (
-        <header className="flex items-center justify-between h-16 w-full px-4 bg-background border-b gap-6 fixed top-0 left-0 right-0 z-50 shadow-sm">
+        <header className="flex items-center justify-between h-16 w-full px-4 bg-background border-b gap-6 fixed top-0 left-0 right-0 z-10 shadow-sm">
             {/**Left Section */}
             <div className="flex items-center gap-2 min-w-fit">
                 {/** sidebar menu logo div */}

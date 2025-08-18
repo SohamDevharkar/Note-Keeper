@@ -5,7 +5,7 @@ import { SidebarBox } from './components/my-components/Sidebar'
 import { NoteView } from './pages/NoteView.jsx';
 import { ArchiveView } from './pages/ArchiveView.jsx';
 import { TrashView } from './pages/TrashView.jsx';
-
+import { ModalView } from './components/my-components/ModalView.jsx';
 
 function App() {
 
@@ -20,14 +20,14 @@ function App() {
     return (
     <>
       <Router>
-        <div className='flex min-h-screen overflow-hidden'>
+        <div className='flex h-screen overflow-hidden'>
           <Header sidebaropen={sidebaropen} setSidebarOpen={setSidebarOpen} />
 
           <div className=''>
             <SidebarBox sidebaropen={sidebaropen} setSidebarOpen={setSidebarOpen}  />
           </div>
 
-          <div className={`mt-16 w-full max-w-[1480px] flex-col  ${sidebaropen ? 'ml-56' : 'ml-16'} border-4 border-green-500 transition-all duration-300`}>
+          <div className={`overflow-auto mt-16 w-full max-w-[1480px] flex-col  ${sidebaropen ? 'ml-56' : 'ml-16'} border-4 border-green-500 transition-all duration-300`}>
             <Routes>
 
               <Route path='/home' element={
@@ -36,6 +36,7 @@ function App() {
                   setInputOpen={setInputOpen}
                   sidebaropen={sidebaropen} 
                   setNotes={setNotes} 
+                  setSelectedNote={setSelectedNote}
                    />
               } />
 
@@ -43,6 +44,7 @@ function App() {
                 <ArchiveView notes={notes}
                   sidebaropen={sidebaropen} 
                   setNotes={setNotes} 
+                  setSelectedNote={setSelectedNote}
                    />
               } />
 
@@ -57,6 +59,9 @@ function App() {
 
             </Routes>
           </div>
+          {
+            selectedNote && <ModalView selectedNote={selectedNote} notes={notes} setNotes={setNotes} setSelectedNote={setSelectedNote}/>
+          }
         </div>
       </Router>
     </>

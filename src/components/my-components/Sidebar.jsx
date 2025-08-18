@@ -43,7 +43,7 @@ export const SidebarBox = ({ sidebaropen}) => {
         //new code
         <div className={`fixed top-16 group border h-screen left-0 
             flex flex-col py-4  transition-all duration-300 
-            ease-in-out z-100 shadow-md  bg-white 
+            ease-in-out z-10 shadow-md  bg-white 
             ${sidebaropen ? 'w-56 ' : 'w-16 hover:w-56'}`}>
             {items.map((item) => {
                 const route = item.view === 'notes' ? '/home' : `/${item.view}`
