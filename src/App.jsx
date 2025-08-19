@@ -63,7 +63,8 @@ function App() {
                 <SearchView notes={notes}
                   sidebaropen={sidebaropen} 
                   setNotes={setNotes} 
-                  searchQuery={searchQuery}/>
+                  searchQuery={searchQuery}
+                  setSelectedNote={setSelectedNote}/>
               } />
 
             </Routes>

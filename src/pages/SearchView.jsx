@@ -2,7 +2,7 @@ import Masonry from "react-masonry-css"
 import { Card } from "../components/my-components/Card"
 import { LuSearch } from "react-icons/lu"
 
-export const SearchView = ({ notes, sidebaropen, setNotes, searchQuery }) => {
+export const SearchView = ({ notes, sidebaropen, setNotes, searchQuery, setSelectedNote}) => {
 
     const filteredNotes = notes.filter((note) => note.view === 'notes' && note.title.toLowerCase().includes(searchQuery.toLowerCase()
         || note.content.toLowerCase().includes(searchQuery)))
