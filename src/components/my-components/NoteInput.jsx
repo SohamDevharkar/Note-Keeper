@@ -51,7 +51,8 @@ export const NoteInput = ({setNotes, inputOpen, setInputOpen}) => {
             id: crypto.randomUUID(),
             title: title,
             content: content,
-            view: 'notes'
+            view: 'notes',
+            prevView: undefined
         }
         const existingNotes = JSON.parse(sessionStorage.getItem('noteList')) || [];
         const updatedNotes = [...existingNotes, newNote];

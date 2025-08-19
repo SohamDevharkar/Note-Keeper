@@ -13,18 +13,44 @@ export const NoteLayout = ({
         setSelectedNote(note);
     }
 
+    // Commenting for upgrading the function
+    // function handleNoteViewChange(noteId, targetView) {
+    //     const updatedNotes = notes.map((note) => {
+    //         if (noteId === note.id) {
+    //             console.log("current note view: " + note.view);
+    //             console.log("target view: " + targetView)
+    //             const newView = note.view === targetView ? 'notes' : targetView;
+    //             return { ...note, view: newView };
+    //         }
+    //         return note;
+    //     });
+    //     console.log("Before updating noteList: " + JSON.stringify(notes));
+    //     setNotes(updatedNotes);
+    //     sessionStorage.setItem('noteList', JSON.stringify(updatedNotes));
+    //     console.log("updated note list: " + JSON.stringify(updatedNotes));
+    // }
+
     function handleNoteViewChange(noteId, targetView) {
         const updatedNotes = notes.map((note) => {
-            if (noteId === note.id) {
-                const newView = note.view === targetView ? 'notes' : targetView;
-                return { ...note, view: newView };
+            if(noteId === note.id) {
+                if(( note.view === 'archive' && targetView === 'unarchive' && note.prevView ) ||
+                   ( note.view === 'trash' && targetView === 'restore' && note.prevView )) {
+                        return { ...note, view: note.prevView, prevView: undefined} ;
+                }
+                return { ...note, prevView: note.view, view: targetView };
             }
             return note;
         });
-        console.log("Before updating noteList: " + JSON.stringify(notes));
         setNotes(updatedNotes);
         sessionStorage.setItem('noteList', JSON.stringify(updatedNotes));
-        console.log("updated note list: " + JSON.stringify(updatedNotes));
+    }
+
+    function handleDeleteNote(noteId) {
+        const deletedNote = notes.find((note) => noteId === note.id)
+        const updatedNotes = notes.filter((note) => note.id !== noteId)
+        setNotes(updatedNotes);
+        sessionStorage.setItem('noteList', JSON.stringify(updatedNotes));
+        console.log("deleted note " + JSON.stringify(deletedNote))
     }
 
     const breakpointColumnsObj = {
@@ -65,6 +91,8 @@ export const NoteLayout = ({
                             bgColor="bg-red-200"
                             onViewChange={handleNoteViewChange}
                             onCardClick={() => openModal(note)}
+                            viewType={note.view}
+                            onDelete={handleDeleteNote}
                         />
                     </div>)
                 })

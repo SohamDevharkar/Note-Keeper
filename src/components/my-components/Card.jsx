@@ -1,30 +1,69 @@
 import { BsTrash } from "react-icons/bs";
 import { RiInboxArchiveLine } from "react-icons/ri"
 import { IoColorPaletteOutline } from "react-icons/io5";
+import { RiInboxUnarchiveLine } from "react-icons/ri";
+import { FaTrashRestore } from "react-icons/fa";
 
 
-export const Card = ({ id, title, content, bgColor, onViewChange,  onCardClick}) => {/**onCardClick */
+export const Card = ({ id, title, content, bgColor, onViewChange, onCardClick, viewType, onDelete }) => {/**onCardClick */
+    let items = [];
 
-    const items = [
-        {
-            title: "Archive",
-            icon: RiInboxArchiveLine,
-            view: 'archive',
-            url: "#"
-        },
-        {
-            title: "Trash",
-            icon: BsTrash,
-            view: 'trash',
-            url: "#"
-        },
-        {
-            title: "theme",
-            icon: IoColorPaletteOutline
-            
-        }
+    if (viewType === 'archive') {
+        items = [
+            {
+                title: "Unarchive",
+                icon: RiInboxUnarchiveLine,
+                view: 'notes'
+            },
+            {
 
-    ]
+                title: "Trash",
+                icon: BsTrash,
+                view: 'trash',
+            },
+            {
+                title: "theme",
+                icon: IoColorPaletteOutline
+            }
+
+        ];
+    } else if (viewType === 'trash') {
+        items = [
+            {
+                title: "Restore",
+                icon: FaTrashRestore,
+                view: 'restore'
+            },
+            {
+                title: "Delete",
+                icon: BsTrash,
+                view:'delete'
+            }
+        ];
+    } else {
+        items = [
+            {
+                title: "Archive",
+                icon: RiInboxArchiveLine,
+                view: 'archive',
+                url: "#"
+            },
+            {
+                title: "Trash",
+                icon: BsTrash,
+                view: 'trash',
+                url: "#"
+            },
+            {
+                title: "theme",
+                icon: IoColorPaletteOutline
+
+            }
+
+        ]
+    }
+
+
 
 
     /**
@@ -35,7 +74,7 @@ export const Card = ({ id, title, content, bgColor, onViewChange,  onCardClick})
     return (
         <div className={`w-90 border-4 hover:border-blue-500 sm:max-w-[250px] md:w-full sm:px-4 min-h-[200px] ${bgColor} 
         rounded-md shadow break-inside-avoid whitespace-pre-wrap flex flex-col justify-between p-4`}
-        onClick={onCardClick}>
+            onClick={onCardClick}>
             <div className="flex-1">
                 <p className="font-semibold font-sans text-xl  border-b-2 ">
                     {title}
@@ -50,8 +89,8 @@ export const Card = ({ id, title, content, bgColor, onViewChange,  onCardClick})
                     <button key={item.title}
                         title={item.title}
                         className="text-gray-600 hover:text-black"
-                        onClick={() => {onViewChange(id, item.view)}}>
-                        <item.icon />
+                        onClick={item.view === 'delete' ? () => {onDelete(id)} : () => { onViewChange(id, item.view) }}>
+                        <item.icon size={20} />
                     </button>
                 ))}
 

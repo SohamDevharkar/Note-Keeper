@@ -6,6 +6,7 @@ import { NoteView } from './pages/NoteView.jsx';
 import { ArchiveView } from './pages/ArchiveView.jsx';
 import { TrashView } from './pages/TrashView.jsx';
 import { ModalView } from './components/my-components/ModalView.jsx';
+import { SearchView } from './pages/SearchView.jsx';
 
 function App() {
 
@@ -16,12 +17,13 @@ function App() {
   });
   const [selectedNote, setSelectedNote] = useState(null);
   const [inputOpen, setInputOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   
     return (
     <>
       <Router>
         <div className='flex h-screen overflow-hidden'>
-          <Header sidebaropen={sidebaropen} setSidebarOpen={setSidebarOpen} />
+          <Header sidebaropen={sidebaropen} setSidebarOpen={setSidebarOpen} searchQuery={searchQuery} setSearchQuery={setSearchQuery}/>
 
           <div className=''>
             <SidebarBox sidebaropen={sidebaropen} setSidebarOpen={setSidebarOpen}  />
@@ -55,6 +57,13 @@ function App() {
                   sidebaropen={sidebaropen} 
                   setNotes={setNotes} 
                    />
+              } />
+
+              <Route path='/search' element={
+                <SearchView notes={notes}
+                  sidebaropen={sidebaropen} 
+                  setNotes={setNotes} 
+                  searchQuery={searchQuery}/>
               } />
 
             </Routes>

@@ -5,10 +5,14 @@ import { FaStickyNote } from "react-icons/fa";
 import { MdArrowBack, MdOutlineGridView } from "react-icons/md";
 import { MdSettings } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
-export const Header = ({ sidebaropen, setSidebarOpen, }) => {
+export const Header = ({ sidebaropen, setSidebarOpen, searchQuery, setSearchQuery }) => {
 
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+    const navigate = useNavigate();
+
+    const route = '/search';
 
     return (
         <header className="flex items-center justify-between h-16 w-full px-4 bg-background border-b gap-6 fixed top-0 left-0 right-0 z-10 shadow-sm">
@@ -47,7 +51,7 @@ export const Header = ({ sidebaropen, setSidebarOpen, }) => {
             <div className={` ${mobileSearchOpen ? 'flex-grow' : 'hidden md:flex flex-grow md:-translate-x-20'} flex max-w-[600px] items-center
                              bg-slate-100 hover:bg-white focus-within:bg-white border-b
                               focus-within:border-gray-300 rounded-md
-                             shadow-sm transition`}
+                             shadow-sm transition`}                             
             >
                 {/* "hidden md:flex flex-grow max-w-2xl mx-6 items-center
     //                         bg-slate-100 hover:bg-white focus-within:bg-white border
@@ -57,7 +61,11 @@ export const Header = ({ sidebaropen, setSidebarOpen, }) => {
                 <LuSearch size={28} className="ml-4 text-gray-600" />
                 <input type="search" placeholder="Search"
                     className="flex-grow px-4 py-2 bg-transparent outline-none text-md"
-                    autoFocus={mobileSearchOpen} />
+                    autoFocus={mobileSearchOpen} 
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    value={searchQuery}
+                    onClick={()=>navigate(route)}
+                />
             </div>
 
 
