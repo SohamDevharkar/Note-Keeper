@@ -7,7 +7,7 @@ import { ArchiveView } from './pages/ArchiveView.jsx';
 import { TrashView } from './pages/TrashView.jsx';
 import { ModalView } from './components/my-components/ModalView.jsx';
 import { SearchView } from './pages/SearchView.jsx';
-import { TbLayoutList } from "react-icons/tb"; // list view icon
+
 
 function App() {
 
@@ -20,13 +20,19 @@ function App() {
   const [inputOpen, setInputOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showPalette, setShowPalette] = useState(false);
-  const [view, setView] = useState('block');
+  const [view, setView] = useState(true);
   
     return (
     <>
       <Router>
         <div className='flex h-screen overflow-hidden'>
-          <Header sidebaropen={sidebaropen} setSidebarOpen={setSidebarOpen} searchQuery={searchQuery} setSearchQuery={setSearchQuery}/>
+          <Header sidebaropen={sidebaropen} 
+                  setSidebarOpen={setSidebarOpen} 
+                  searchQuery={searchQuery} 
+                  setSearchQuery={setSearchQuery}
+                  view={view}
+                  setView={setView}
+          />
 
           <div className=''>
             <SidebarBox sidebaropen={sidebaropen} setSidebarOpen={setSidebarOpen}  />
@@ -42,6 +48,8 @@ function App() {
                   sidebaropen={sidebaropen} 
                   setNotes={setNotes} 
                   setSelectedNote={setSelectedNote}
+                  view={view}
+                  setView={setView}
                    />
               } />
 
@@ -50,6 +58,8 @@ function App() {
                   sidebaropen={sidebaropen} 
                   setNotes={setNotes} 
                   setSelectedNote={setSelectedNote}
+                  view={view}
+                  setView={setView}
                    />
               } />
 
@@ -58,7 +68,9 @@ function App() {
                   inputOpen={inputOpen} 
                   setInputOpen={setInputOpen}
                   sidebaropen={sidebaropen} 
-                  setNotes={setNotes} 
+                  setNotes={setNotes}
+                  view={view}
+                  setView={setView} 
                    />
               } />
 

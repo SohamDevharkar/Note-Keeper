@@ -6,9 +6,11 @@ export const ArchiveView = ({
     setNotes,
     sidebaropen,
     setSelectedNote,
+    view,
+    setView
 }) => {
-    const filteredArchiveNotes = notes.filter((note) => note.view ==='archive');
-    
+    const filteredArchiveNotes = notes.filter((note) => note.view === 'archive');
+
     function isArrayNullOrEmpty(filteredArchiveNotes) {
         return notes === null || notes === undefined || (Array.isArray(notes) && notes.length === 0);
     }
@@ -27,7 +29,9 @@ export const ArchiveView = ({
                     notes={notes}
                     setNotes={setNotes}
                     sidebaropen={sidebaropen}
-                    setSelectedNote={setSelectedNote}  
+                    setSelectedNote={setSelectedNote}
+                    view={view}
+                    setView={setView}
                 />
             )
         }

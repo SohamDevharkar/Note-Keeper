@@ -6,8 +6,9 @@ import { MdArrowBack, MdOutlineGridView } from "react-icons/md";
 import { MdSettings } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { TbLayoutList } from "react-icons/tb"; // list view icon
 
-export const Header = ({ sidebaropen, setSidebarOpen, searchQuery, setSearchQuery }) => {
+export const Header = ({ sidebaropen, setSidebarOpen, searchQuery, setSearchQuery, view, setView }) => {
 
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
     const navigate = useNavigate();
@@ -70,7 +71,7 @@ export const Header = ({ sidebaropen, setSidebarOpen, searchQuery, setSearchQuer
 
 
             {/**Right section*/}
-            <div className={`flex items-center gap-1 justify-between ml-`}>
+            <div className={`flex items-center gap-2.5 md:gap-6 justify-between `}>
                 {/** Mobile Search Icon (only visible when search is closed) */}
                 {!mobileSearchOpen && (
                     <div onClick={() => setMobileSearchOpen(true)}
@@ -80,8 +81,9 @@ export const Header = ({ sidebaropen, setSidebarOpen, searchQuery, setSearchQuer
                 )}
 
                 {/** View Toggle */}
-                <div className="rounded-full w-8 h-8 flex items-center justify-center hover:bg-slate-200 transition ">
-                    <MdOutlineGridView size={24} />
+                <div className="rounded-full w-8 h-8 flex items-center justify-center hover:bg-slate-200 transition"
+                    onClick={() => setView(!view)}>
+                    {view ? <MdOutlineGridView size={24} /> : <TbLayoutList size={24}/>}
                 </div>
 
                 {/**Setting icon */}
@@ -90,7 +92,7 @@ export const Header = ({ sidebaropen, setSidebarOpen, searchQuery, setSearchQuer
                 </div>
 
                 {/**Avator Icon */}
-                <div className=" rounded-full w-6 h-6  flex items-center justify-center hover:bg-slate-200 transition">
+                <div className=" rounded-full w-8 h-8 flex items-center justify-center hover:bg-slate-200 transition">
                     <FaUser size={22} />
                 </div>
             </div>

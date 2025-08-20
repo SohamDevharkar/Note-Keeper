@@ -7,7 +7,20 @@ import { Pallete } from "./Pallete";
 import { useState } from "react";
 
 
-export const Card = ({ id, title, content, bgColor ,onViewChange, onCardClick, viewType, onDelete, notes, setNotes }) => {/**onCardClick */
+export const Card = ({ 
+    id, 
+    title, 
+    content, 
+    bgColor ,
+    onViewChange, 
+    onCardClick, 
+    viewType, 
+    onDelete, 
+    notes, 
+    setNotes,
+    view, 
+    setView
+ }) => {/**onCardClick */
     
     const [showPalette, setShowPalette] = useState(false);
 
@@ -77,7 +90,7 @@ export const Card = ({ id, title, content, bgColor ,onViewChange, onCardClick, v
      */
 
     return (
-        <div className={`w-90 border-2 hover:border-blue-500 sm:max-w-[250px] md:w-full sm:px-2 min-h-[200px] ${bgColor} 
+        <div className={`${view ? 'max-w-screen-lg  my-4 min-h-[100px] w-full': 'sm:max-w-[250px] sm:px-2'} w-90 border-2 hover:border-blue-500   min-h-[200px] ${bgColor} 
         rounded-md shadow break-inside-avoid whitespace-pre-wrap flex flex-col justify-between `}
             onClick={onCardClick}>
             <div className="flex-1">

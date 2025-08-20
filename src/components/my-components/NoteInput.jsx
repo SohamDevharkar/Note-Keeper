@@ -68,7 +68,7 @@ export const NoteInput = ({setNotes, inputOpen, setInputOpen}) => {
     
     return (
     <div ref={wrapperRef} 
-        className={`relative top-2.5 transform left-1/2 -translate-x-1/2 w-full max-w-[680px]
+        className={`relative top-5 transform left-1/2 -translate-x-1/2 w-full max-w-[680px]
         min-w-[300px] px-8 sm:px-18 md:px-20 sm:ml-0 transition-transform duration-300
         `}>
             {!inputOpen ? (
@@ -83,9 +83,9 @@ export const NoteInput = ({setNotes, inputOpen, setInputOpen}) => {
                 </div>
             ):(
                 //expanded state
-                <div className="bg-white shadow-xl rounded-xl px-4 py-3 transition-all duration-500 z-100 min-h-[60px]">
+                <div className="bg-white shadow-xl rounded-xl px-4 py-4 transition-all duration-500 z-100 min-h-[150px]">
                     <input ref={titleRef} placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)}
-                        className="w-full text-lg font-medium focus:outline-none mb-2" />
+                        className="w-full text-lg font-medium focus:outline-none mb-4" />
                     <hr/>    
                     <div className={`${inputOpen ? 'pt-1 w-full' : 'hidden'} bg-white  `}>
                         <TipTapEditor

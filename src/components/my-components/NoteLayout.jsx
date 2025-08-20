@@ -7,8 +7,10 @@ export const NoteLayout = ({
     setNotes,
     sidebaropen,
     setSelectedNote,
-    }) => {
-    
+    view, 
+    setView
+}) => {
+
 
 
     const openModal = (note) => {
@@ -32,12 +34,16 @@ export const NoteLayout = ({
     //     console.log("updated note list: " + JSON.stringify(updatedNotes));
     // }
 
+    function handleViewType() {
+        setView((s) => !s)
+    }
+
     function handleNoteViewChange(noteId, targetView) {
         const updatedNotes = notes.map((note) => {
-            if(noteId === note.id) {
-                if(( note.view === 'archive' && targetView === 'unarchive' && note.prevView ) ||
-                   ( note.view === 'trash' && targetView === 'restore' && note.prevView )) {
-                        return { ...note, view: note.prevView, prevView: undefined} ;
+            if (noteId === note.id) {
+                if ((note.view === 'archive' && targetView === 'unarchive' && note.prevView) ||
+                    (note.view === 'trash' && targetView === 'restore' && note.prevView)) {
+                    return { ...note, view: note.prevView, prevView: undefined };
                 }
                 return { ...note, prevView: note.view, view: targetView };
             }
@@ -81,27 +87,60 @@ export const NoteLayout = ({
     //     }
     // </div>
 
-    return <div className={`w-full  min-h-[200px] `}>
-        <Masonry breakpointCols={breakpointColumnsObj}
-            className="my-masonry-grid "
-            columnClassName="my-masonry-grid_column ">
+    return (
+        <div className={`w-full  min-h-[200px] `}>
             {
-                filteredNotes.reverse().map((note) => {
-                    return (<div key={note.id} >
-                        <Card id={note.id} title={note.title}
-                            content={note.content}
-                            bgColor={note.color}
-                            onViewChange={handleNoteViewChange}
-                            onCardClick={() => openModal(note)}
-                            viewType={note.view}
-                            onDelete={handleDeleteNote}
-                            notes={notes}
-                            setNotes={setNotes}
-                            
-                        />
-                    </div>)
-                })
+                view === true ?
+                    (
+                        <div className='  flex flex-col justify-center items-center '>
+                            <div className='px-4 mx-6 w-full max-w-[700px]'>
+                                {
+                                    filteredNotes.reverse().map((note) => {
+                                        return (
+                                            <div key={note.id} >
+                                                <Card id={note.id} title={note.title}
+                                                    content={note.content}
+                                                    bgColor={note.color}
+                                                    onViewChange={handleNoteViewChange}
+                                                    onCardClick={() => openModal(note)}
+                                                    viewType={note.view}
+                                                    onDelete={handleDeleteNote}
+                                                    notes={notes}
+                                                    setNotes={setNotes}
+                                                    view={view}
+                                                    setView={setView}
+                                                />
+                                            </div>
+                                        )
+                                    })
+                                }
+
+                            </div>
+                        </div>
+                    ) : (
+                        <Masonry breakpointCols={breakpointColumnsObj}
+                            className="my-masonry-grid "
+                            columnClassName="my-masonry-grid_column ">
+                            {
+                                filteredNotes.reverse().map((note) => {
+                                    return (<div key={note.id} >
+                                        <Card id={note.id} title={note.title}
+                                            content={note.content}
+                                            bgColor={note.color}
+                                            onViewChange={handleNoteViewChange}
+                                            onCardClick={() => openModal(note)}
+                                            viewType={note.view}
+                                            onDelete={handleDeleteNote}
+                                            notes={notes}
+                                            setNotes={setNotes}
+                                        />
+                                    </div>)
+                                })
+                            }
+                        </Masonry>
+                    )
+
             }
-        </Masonry>
-    </div>
+        </div>
+    )
 }
