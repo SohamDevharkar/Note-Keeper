@@ -3,9 +3,14 @@ import { RiInboxArchiveLine } from "react-icons/ri"
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { RiInboxUnarchiveLine } from "react-icons/ri";
 import { FaTrashRestore } from "react-icons/fa";
+import { Pallete } from "./Pallete";
+import { useState } from "react";
 
 
-export const Card = ({ id, title, content, bgColor, onViewChange, onCardClick, viewType, onDelete }) => {/**onCardClick */
+export const Card = ({ id, title, content, bgColor ,onViewChange, onCardClick, viewType, onDelete, notes, setNotes }) => {/**onCardClick */
+    
+    const [showPalette, setShowPalette] = useState(false);
+
     let items = [];
 
     if (viewType === 'archive') {
@@ -37,7 +42,7 @@ export const Card = ({ id, title, content, bgColor, onViewChange, onCardClick, v
             {
                 title: "Delete",
                 icon: BsTrash,
-                view:'delete'
+                view: 'delete'
             }
         ];
     } else {
@@ -72,8 +77,8 @@ export const Card = ({ id, title, content, bgColor, onViewChange, onCardClick, v
      */
 
     return (
-        <div className={`w-90 border-4 hover:border-blue-500 sm:max-w-[250px] md:w-full sm:px-4 min-h-[200px] ${bgColor} 
-        rounded-md shadow break-inside-avoid whitespace-pre-wrap flex flex-col justify-between p-4`}
+        <div className={`w-90 border-2 hover:border-blue-500 sm:max-w-[250px] md:w-full sm:px-2 min-h-[200px] ${bgColor} 
+        rounded-md shadow break-inside-avoid whitespace-pre-wrap flex flex-col justify-between `}
             onClick={onCardClick}>
             <div className="flex-1">
                 <p className="font-semibold font-sans text-xl  border-b-2 ">
@@ -84,15 +89,53 @@ export const Card = ({ id, title, content, bgColor, onViewChange, onCardClick, v
             <p className="flex-10">
                 {content}
             </p>
-            <div className="mt-2 flex justify-around border-t p-1" onClick={(e) => e.stopPropagation()}>
-                {items.map((item) => (
+            <div className=" flex justify-around border-t p-1" onClick={(e) => e.stopPropagation()}>
+                {/* {items.map((item) => (
                     <button key={item.title}
                         title={item.title}
                         className="text-gray-600 hover:text-black"
-                        onClick={item.view === 'delete' ? () => {onDelete(id)} : () => { onViewChange(id, item.view) }}>
+                        onClick={item.view === 'delete' ? () => {onDelete(id)} : () => { onViewChange(id, item.view)}}>
                         <item.icon size={20} />
                     </button>
+                ))} */}
+
+                {items.map((item) => (
+                    item.title === 'theme' ? (
+                        <div key={item.title} className="relative z-10 mt-2">
+                            <button
+                                title={item.title}
+                                className="text-gray-600 hover:text-black"
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    setShowPalette(s => !s); // Toggle palette
+                                }}
+                            >
+                                <item.icon size={20}  />
+                            </button>
+                            {showPalette && (
+                                <Pallete
+                                    id={id}
+                                    setShowPalette={setShowPalette}
+                                    notes={notes}
+                                    setNotes={setNotes}
+                                />
+                            )}
+                        </div>
+                    ) : (
+                        <button
+                            key={item.title}
+                            title={item.title}
+                            className="text-gray-600 hover:text-black z-10"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                item.view === 'delete'? onDelete(id) : onViewChange(id, item.view);
+                            }}
+                        >
+                            <item.icon size={20} />
+                        </button>
+                    )
                 ))}
+
 
             </div>
         </div>

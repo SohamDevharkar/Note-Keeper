@@ -6,7 +6,9 @@ export const NoteLayout = ({
     notes,
     setNotes,
     sidebaropen,
-    setSelectedNote }) => {
+    setSelectedNote,
+    }) => {
+    
 
 
     const openModal = (note) => {
@@ -79,20 +81,23 @@ export const NoteLayout = ({
     //     }
     // </div>
 
-    return <div className={`w-full  min-h-[400px] `}>
+    return <div className={`w-full  min-h-[200px] `}>
         <Masonry breakpointCols={breakpointColumnsObj}
             className="my-masonry-grid "
             columnClassName="my-masonry-grid_column ">
             {
                 filteredNotes.reverse().map((note) => {
-                    return (<div key={note.id}  >
+                    return (<div key={note.id} >
                         <Card id={note.id} title={note.title}
                             content={note.content}
-                            bgColor="bg-red-200"
+                            bgColor={note.color}
                             onViewChange={handleNoteViewChange}
                             onCardClick={() => openModal(note)}
                             viewType={note.view}
                             onDelete={handleDeleteNote}
+                            notes={notes}
+                            setNotes={setNotes}
+                            
                         />
                     </div>)
                 })

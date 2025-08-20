@@ -7,7 +7,7 @@ import { FaBold } from "react-icons/fa";
 import { ImUnderline } from "react-icons/im";
 import { FiItalic } from "react-icons/fi";
 
-export function TipTapEditor({ value, onChange, placeholder, className, singleLine, showTipTapMenu }) {
+export function TipTapEditor({ value, onChange, placeholder, className, singleLine, showTipTapMenu,}) {
 
     const editor = useEditor({
         extensions: [StarterKit.configure({
@@ -59,7 +59,7 @@ function Menubar({ editor }) {
     const currentFontSize = editor.getAttributes('textStyle').fontSize || '16px';
 
     return (
-        <div className="flex px-5 gap-2 bg-white w-full   ">
+        <div className={`flex px-2 gap-2 bg-white w-50 translate-x-40 rounded-lg`}>
             {/* Formatting (Bold as example; replace with dropdown for full menu) */}
             <button
                 title="Bold"

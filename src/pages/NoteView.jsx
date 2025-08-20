@@ -6,7 +6,8 @@ export const NoteView = ({ sidebaropen,
   notes,
   setNotes,
   setInputOpen,
-  setSelectedNote
+  setSelectedNote,
+  
 }) => {
 
     const filteredNotes = notes.filter((note) => note.view === 'notes');
@@ -20,7 +21,8 @@ export const NoteView = ({ sidebaropen,
         sidebaropen={sidebaropen}
         notes={notes}
         setSelectedNote={setSelectedNote}
-        />
+        
+      />
     </div>
   </>)
 }

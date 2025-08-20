@@ -7,6 +7,7 @@ import { ArchiveView } from './pages/ArchiveView.jsx';
 import { TrashView } from './pages/TrashView.jsx';
 import { ModalView } from './components/my-components/ModalView.jsx';
 import { SearchView } from './pages/SearchView.jsx';
+import { TbLayoutList } from "react-icons/tb"; // list view icon
 
 function App() {
 
@@ -18,6 +19,8 @@ function App() {
   const [selectedNote, setSelectedNote] = useState(null);
   const [inputOpen, setInputOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showPalette, setShowPalette] = useState(false);
+  const [view, setView] = useState('block');
   
     return (
     <>
@@ -64,13 +67,20 @@ function App() {
                   sidebaropen={sidebaropen} 
                   setNotes={setNotes} 
                   searchQuery={searchQuery}
-                  setSelectedNote={setSelectedNote}/>
-              } />
+                  setSelectedNote={setSelectedNote}
+                />} 
+              />
 
             </Routes>
           </div>
           {
-            selectedNote && <ModalView selectedNote={selectedNote} notes={notes} setNotes={setNotes} setSelectedNote={setSelectedNote}/>
+            selectedNote && 
+              <ModalView selectedNote={selectedNote} 
+                notes={notes} setNotes={setNotes} 
+                setSelectedNote={setSelectedNote}
+                showPalette={showPalette}
+                setShowPalette={setShowPalette}
+            />
           }
         </div>
       </Router>

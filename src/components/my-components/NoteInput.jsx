@@ -52,7 +52,8 @@ export const NoteInput = ({setNotes, inputOpen, setInputOpen}) => {
             title: title,
             content: content,
             view: 'notes',
-            prevView: undefined
+            prevView: undefined,
+            color: 'bg-white'
         }
         const existingNotes = JSON.parse(sessionStorage.getItem('noteList')) || [];
         const updatedNotes = [...existingNotes, newNote];
