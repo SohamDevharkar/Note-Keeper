@@ -49,7 +49,6 @@ function App() {
                   setNotes={setNotes} 
                   setSelectedNote={setSelectedNote}
                   view={view}
-                  setView={setView}
                    />
               } />
 
@@ -59,7 +58,6 @@ function App() {
                   setNotes={setNotes} 
                   setSelectedNote={setSelectedNote}
                   view={view}
-                  setView={setView}
                    />
               } />
 
@@ -69,8 +67,7 @@ function App() {
                   setInputOpen={setInputOpen}
                   sidebaropen={sidebaropen} 
                   setNotes={setNotes}
-                  view={view}
-                  setView={setView} 
+                  view={view} 
                    />
               } />
 

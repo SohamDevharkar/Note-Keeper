@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { TipTapEditor } from "./Tiptap";
 import { IoColorPaletteOutline } from "react-icons/io5";
-import { BsTrash } from "react-icons/bs";
+import { BsPin, BsPinFill, BsTrash } from "react-icons/bs";
 import { RiInboxArchiveLine } from "react-icons/ri";
 import { MdFormatColorText } from "react-icons/md";
 import { Palette } from "lucide-react";
@@ -62,6 +62,7 @@ export const ModalView = ({ selectedNote, setSelectedNote, notes, setNotes, }) =
     const [showTipTapMenu, setShowTipTapMenu] = useState(false);
     const [showPalette, setShowPalette] = useState(false);
     const [color, setColor] = useState(selectedNote.color || 'bg-white');
+    const [pinned, setPinned] = useState(selectedNote.pinned);
 
 
 
@@ -93,16 +94,12 @@ export const ModalView = ({ selectedNote, setSelectedNote, notes, setNotes, }) =
         setSelectedNote(null);
     }
 
-    const onChangeColor= (c) =>{
-        setColor(c)
-    }
-
     // function handleSubmit(updatedNote) {
     //     // const notes = sessionStorage.getItem('noteList');
     //     const updatedNoteWithBgColor = {...updatedNote, color: color}
     //     const updatedNoteList = notes.map((note) => {
     //         console.log("updated note id: " + updatedNote.id)
-            
+
     //         if (note.id === updatedNoteWithBgColor.id) {
     //             console.log("updatedNote: ", { title: updatedNote.title, content: updatedNote.content })
 
@@ -117,7 +114,7 @@ export const ModalView = ({ selectedNote, setSelectedNote, notes, setNotes, }) =
     // }
 
     function handleSubmit(updatedNote) {
-        const updatedNoteWithBgColor = { ...updatedNote, color: color };
+        const updatedNoteWithBgColor = { ...updatedNote, color: color, pinned: pinned };
         const updatedNoteList = notes.map((note) => {
             if (note.id === updatedNoteWithBgColor.id) {
                 return updatedNoteWithBgColor;
@@ -152,8 +149,15 @@ export const ModalView = ({ selectedNote, setSelectedNote, notes, setNotes, }) =
             <div className="bg-black opacity-40 absolute inset-0" />
             <div className={`relative ${color} border-2 border-red-500 min-h-[600px] w-150 rounded-md `}>
                 <div className={`max-w-full h-full  border-4 my-2 border-transparent rounded-md`}>
-                    <input placeholder="Title" value={title} className="focus:border-b pb-2  outline-none focus:border-b-black w-full h-full text-3xl"
-                        onChange={(e) => setTitle(e.target.value)} />
+                    <div className="flex items-center">
+                        <input placeholder="Title" value={title} className="focus:border-b pb-2  outline-none focus:border-b-black w-full h-full text-3xl"
+                            onChange={(e) => setTitle(e.target.value)} />
+                        <span className="p-2 hover:bg-slate-200 rounded-full"
+                            onClick={() => setPinned(!pinned)}>
+                            {pinned ? <BsPinFill size={22} /> : <BsPin size={22} />}
+                        </span>
+                    </div>
+
                     <TipTapEditor
                         value={content}
                         onChange={setContent}
@@ -198,7 +202,7 @@ export const ModalView = ({ selectedNote, setSelectedNote, notes, setNotes, }) =
                                                     setShowPalette={setShowPalette}
                                                     color={color}           // pass current local color
                                                     setColor={setColor}
-                                                    
+
                                                 />
                                             }
                                         </div>

@@ -4,13 +4,13 @@ import { NoteLayout } from "../components/my-components/NoteLayout"
 export const SearchView = ({ notes, sidebaropen, setNotes, searchQuery, setSelectedNote }) => {
 
     const filteredNotes = notes.filter((note) => note.view === 'notes' && (note.title.toLowerCase().includes(searchQuery.toLowerCase())
-        || note.content.toLowerCase().includes(searchQuery)))
+        || note.content.toLowerCase().includes(searchQuery.toLowerCase())))
 
     const filteredArchivedNotes = notes.filter((note) => note.view === 'archive' && (note.title.toLowerCase().includes(searchQuery.toLowerCase())
-        || note.content.toLowerCase().includes(searchQuery)))
+        || note.content.toLowerCase().includes(searchQuery.toLowerCase())))
 
     const filteredTrashedNotes = notes.filter((note) => note.view === 'trash' && (note.title.toLowerCase().includes(searchQuery.toLowerCase())
-        || note.content.toLowerCase().includes(searchQuery)))
+        || note.content.toLowerCase().includes(searchQuery.toLowerCase())))
 
     return (
         <div>

@@ -8,10 +8,10 @@ export const NoteView = ({ sidebaropen,
   setInputOpen,
   setSelectedNote,
   view,
-  setView
+  
 }) => {
 
-  const filteredNotes = notes.filter((note) => note.view === 'notes');
+  const filteredNotes = notes.filter(note => note && note.view === 'notes');
 
   return (<>
     <div className={`min-h-[100px] bg-orange-300 border-4 transition-all duration-100`}>
@@ -23,7 +23,6 @@ export const NoteView = ({ sidebaropen,
         notes={notes}
         setSelectedNote={setSelectedNote}
         view={view}
-        setView={setView}
       />
     </div>
   </>)

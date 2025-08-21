@@ -7,8 +7,7 @@ export const NoteLayout = ({
     setNotes,
     sidebaropen,
     setSelectedNote,
-    view, 
-    setView
+    view,
 }) => {
 
 
@@ -33,10 +32,6 @@ export const NoteLayout = ({
     //     sessionStorage.setItem('noteList', JSON.stringify(updatedNotes));
     //     console.log("updated note list: " + JSON.stringify(updatedNotes));
     // }
-
-    function handleViewType() {
-        setView((s) => !s)
-    }
 
     function handleNoteViewChange(noteId, targetView) {
         const updatedNotes = notes.map((note) => {
@@ -87,59 +82,203 @@ export const NoteLayout = ({
     //     }
     // </div>
 
+    const { pinnedNotes, otherNotes } = filteredNotes.reduce((acc, note) => (acc[note.pinned ? 'pinnedNotes' : 'otherNotes'].push(note), acc), { pinnedNotes: [], otherNotes: [] })
+
     return (
+        // <div className={`w-full  min-h-[200px] `}>
+        //     { view === true ?
+        //             (
+        //                 <div className='  flex flex-col justify-center items-center '>
+        //                     <div className='px-4 mx-6 w-full max-w-[700px]'>
+        //                         {
+        //                             filteredNotes.reverse().map((note) => {
+        //                                 return (
+        //                                     <div key={note.id} >
+        //                                         <Card id={note.id} title={note.title}
+        //                                             content={note.content}
+        //                                             bgColor={note.color}
+        //                                             onViewChange={handleNoteViewChange}
+        //                                             onCardClick={() => openModal(note)}
+        //                                             viewType={note.view}
+        //                                             onDelete={handleDeleteNote}
+        //                                             notes={notes}
+        //                                             setNotes={setNotes}
+        //                                             view={view}
+        //                                             pinned={note.pinned}
+        //                                         />
+        //                                     </div>
+        //                                 )
+        //                             })
+        //                         }
+
+        //                     </div>
+        //                 </div>
+        //             ) : 
+        //             (
+        //                 <Masonry breakpointCols={breakpointColumnsObj}
+        //                     className="my-masonry-grid "
+        //                     columnClassName="my-masonry-grid_column ">
+        //                     {
+        //                         filteredNotes.reverse().map((note) => {
+        //                             return (<div key={note.id} >
+        //                                 <Card id={note.id} title={note.title}
+        //                                     content={note.content}
+        //                                     bgColor={note.color}
+        //                                     onViewChange={handleNoteViewChange}
+        //                                     onCardClick={() => openModal(note)}
+        //                                     viewType={note.view}
+        //                                     onDelete={handleDeleteNote}
+        //                                     notes={notes}
+        //                                     pinned={note.pinned}
+        //                                 />
+        //                             </div>)
+        //                         })
+        //                     }
+        //                 </Masonry>
+        //             )
+        //     }
+        // </div>
+
         <div className={`w-full  min-h-[200px] `}>
-            {
-                view === true ?
-                    (
-                        <div className='  flex flex-col justify-center items-center '>
-                            <div className='px-4 mx-6 w-full max-w-[700px]'>
-                                {
-                                    filteredNotes.reverse().map((note) => {
-                                        return (
-                                            <div key={note.id} >
-                                                <Card id={note.id} title={note.title}
-                                                    content={note.content}
-                                                    bgColor={note.color}
-                                                    onViewChange={handleNoteViewChange}
-                                                    onCardClick={() => openModal(note)}
-                                                    viewType={note.view}
-                                                    onDelete={handleDeleteNote}
-                                                    notes={notes}
-                                                    setNotes={setNotes}
-                                                    view={view}
-                                                    setView={setView}
-                                                />
-                                            </div>
-                                        )
-                                    })
-                                }
-
-                            </div>
-                        </div>
-                    ) : (
-                        <Masonry breakpointCols={breakpointColumnsObj}
-                            className="my-masonry-grid "
-                            columnClassName="my-masonry-grid_column ">
+            {view === true ?
+                (
+                    <div className='  flex flex-col justify-center items-center '>
+                        <div className='px-4 mx-6 w-full max-w-[700px]'>
                             {
-                                filteredNotes.reverse().map((note) => {
-                                    return (<div key={note.id} >
-                                        <Card id={note.id} title={note.title}
-                                            content={note.content}
-                                            bgColor={note.color}
-                                            onViewChange={handleNoteViewChange}
-                                            onCardClick={() => openModal(note)}
-                                            viewType={note.view}
-                                            onDelete={handleDeleteNote}
-                                            notes={notes}
-                                            setNotes={setNotes}
-                                        />
-                                    </div>)
-                                })
+                                pinnedNotes.length > 0 && (
+                                    <div>
+                                        <div className='font-sans text-lg text-slate-400 mb-4'>
+                                            Pinned:
+                                        </div>
+                                        {
+                                            pinnedNotes.reverse().map((note) => {
+                                                return (
+                                                    <div key={note.id} >
+                                                        <Card id={note.id} title={note.title}
+                                                            content={note.content}
+                                                            bgColor={note.color}
+                                                            onViewChange={handleNoteViewChange}
+                                                            onCardClick={() => openModal(note)}
+                                                            viewType={note.view}
+                                                            onDelete={handleDeleteNote}
+                                                            notes={notes}
+                                                            setNotes={setNotes}
+                                                            view={view}
+                                                            pinned={note.pinned}
+                                                        />
+                                                    </div>
+                                                )
+                                            })
+                                        }
+                                    </div>
+                                )
                             }
-                        </Masonry>
-                    )
 
+                            {
+                                otherNotes.length > 0 && (
+                                    <div>
+                                        <div className='font-sans text-lg text-slate-400 mb-4'>
+                                            Other:
+                                        </div>
+                                        {
+                                            otherNotes.reverse().map((note) => {
+                                                return (
+                                                    <div key={note.id} >
+                                                        <Card id={note.id} title={note.title}
+                                                            content={note.content}
+                                                            bgColor={note.color}
+                                                            onViewChange={handleNoteViewChange}
+                                                            onCardClick={() => openModal(note)}
+                                                            viewType={note.view}
+                                                            onDelete={handleDeleteNote}
+                                                            notes={notes}
+                                                            setNotes={setNotes}
+                                                            view={view}
+                                                            pinned={note.pinned}
+                                                        />
+                                                    </div>
+                                                )
+                                            })
+                                        }
+                                    </div>
+                                )
+                            }
+
+                        </div>
+                    </div>
+                ) :
+                (
+                    <>
+                        {
+                            pinnedNotes.length > 0 && (
+                                <div>
+                                    <div className='font-sans text-lg text-slate-400 px-6 mb-4'>
+                                        Pinned:
+                                    </div>
+                                    <Masonry breakpointCols={breakpointColumnsObj}
+                                        className="my-masonry-grid "
+                                        columnClassName="my-masonry-grid_column ">
+                                        {
+                                            pinnedNotes.reverse().map((note) => {
+                                                return (
+                                                    <div key={note.id} >
+                                                        <Card id={note.id} title={note.title}
+                                                            content={note.content}
+                                                            bgColor={note.color}
+                                                            onViewChange={handleNoteViewChange}
+                                                            onCardClick={() => openModal(note)}
+                                                            viewType={note.view}
+                                                            onDelete={handleDeleteNote}
+                                                            notes={notes}
+                                                            setNotes={setNotes}
+                                                            view={view}
+                                                            pinned={note.pinned}
+                                                        />
+                                                    </div>
+                                                )
+                                            })
+                                        }
+                                    </Masonry>
+                                </div>
+                            )
+                        }
+
+                        {
+                            otherNotes.length > 0 && (
+                                <div>
+                                    <div className='font-sans text-lg text-slate-400 px-6 mb-4'>
+                                        Other:
+                                    </div>
+                                    <Masonry breakpointCols={breakpointColumnsObj}
+                                        className="my-masonry-grid "
+                                        columnClassName="my-masonry-grid_column ">
+                                        {
+                                            otherNotes.reverse().map((note) => {
+                                                return (
+                                                    <div key={note.id} >
+                                                        <Card id={note.id} title={note.title}
+                                                            content={note.content}
+                                                            bgColor={note.color}
+                                                            onViewChange={handleNoteViewChange}
+                                                            onCardClick={() => openModal(note)}
+                                                            viewType={note.view}
+                                                            onDelete={handleDeleteNote}
+                                                            notes={notes}
+                                                            setNotes={setNotes}
+                                                            view={view}
+                                                            pinned={note.pinned}
+                                                        />
+                                                    </div>
+                                                )
+                                            })
+                                        }
+                                    </Masonry>
+                                </div>
+                            )
+                        }
+
+                    </>
+                )
             }
         </div>
     )

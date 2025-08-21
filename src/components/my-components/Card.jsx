@@ -1,4 +1,4 @@
-import { BsTrash } from "react-icons/bs";
+import { BsPin, BsPinFill, BsTrash } from "react-icons/bs";
 import { RiInboxArchiveLine } from "react-icons/ri"
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { RiInboxUnarchiveLine } from "react-icons/ri";
@@ -18,8 +18,8 @@ export const Card = ({
     onDelete, 
     notes, 
     setNotes,
-    view, 
-    setView
+    view,
+    pinned
  }) => {/**onCardClick */
     
     const [showPalette, setShowPalette] = useState(false);
@@ -81,6 +81,15 @@ export const Card = ({
         ]
     }
 
+    function handlePinToggle(e) {
+        e.stopPropagation(); 
+        const updatedNotes = notes.map((note) => {
+            return note.id === id ? {...note, pinned: !note.pinned} : note;
+        });
+        setNotes(updatedNotes);
+        sessionStorage.setItem('noteList', JSON.stringify(updatedNotes));
+    }
+
 
 
 
@@ -90,13 +99,19 @@ export const Card = ({
      */
 
     return (
-        <div className={`${view ? 'max-w-screen-lg  my-4 min-h-[100px] w-full': 'sm:max-w-[250px] sm:px-2'} w-90 border-2 hover:border-blue-500   min-h-[200px] ${bgColor} 
-        rounded-md shadow break-inside-avoid whitespace-pre-wrap flex flex-col justify-between `}
+        <div className={`${view ? 'max-w-screen-lg  my-4 min-h-[100px] w-full': 'sm:max-w-[250px] sm:px-2'} 
+                        w-90 border-2 hover:border-blue-500  min-h-[200px] ${bgColor} 
+                        rounded-md shadow break-inside-avoid whitespace-pre-wrap flex flex-col justify-between`
+                    }
             onClick={onCardClick}>
-            <div className="flex-1">
-                <p className="font-semibold font-sans text-xl  border-b-2 ">
+            <div className="flex items-center">
+                <p className=" px-2 font-semibold font-sans text-xl w-full border-b-2 ">
                     {title}
                 </p>
+                <span className="p-2 hover:bg-slate-200 rounded-full"
+                    onClick={handlePinToggle}>
+                    {pinned ? <BsPinFill size={18}/> : <BsPin size={18}/>}
+                </span>
             </div>
 
             <p className="flex-10">

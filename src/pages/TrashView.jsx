@@ -6,7 +6,6 @@ export const TrashView = ({
     setNotes,
     sidebaropen,
     view,
-    setView
 }) => {
 
     const filteredTrashNotes = notes.filter((note) => note.view === 'trash');
@@ -30,7 +29,6 @@ export const TrashView = ({
                     setNotes={setNotes}
                     sidebaropen={sidebaropen}
                     view={view}
-                    setView={setView}
                 />
             )
         }

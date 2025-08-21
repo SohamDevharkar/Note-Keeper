@@ -7,7 +7,6 @@ export const ArchiveView = ({
     sidebaropen,
     setSelectedNote,
     view,
-    setView
 }) => {
     const filteredArchiveNotes = notes.filter((note) => note.view === 'archive');
 
@@ -31,7 +30,6 @@ export const ArchiveView = ({
                     sidebaropen={sidebaropen}
                     setSelectedNote={setSelectedNote}
                     view={view}
-                    setView={setView}
                 />
             )
         }
