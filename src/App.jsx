@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Header } from './components/my-components/Header'
-import { SidebarBox } from './components/my-components/Sidebar'
 import { NoteView } from './pages/NoteView.jsx';
 import { ArchiveView } from './pages/ArchiveView.jsx';
 import { TrashView } from './pages/TrashView.jsx';
-import { ModalView } from './components/my-components/ModalView.jsx';
 import { SearchView } from './pages/SearchView.jsx';
+import { AppLayout } from './pages/AppLayout.jsx';
+import { SignUpForm } from './pages/SignUpPg.jsx';
+import { SignInForm } from './pages/SignInPg.jsx';
 
 
 function App() {
@@ -20,79 +20,76 @@ function App() {
   const [inputOpen, setInputOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showPalette, setShowPalette] = useState(false);
-  const [view, setView] = useState(true);
-  
-    return (
+  const [view, setView] = useState(false);
+
+  return (
     <>
       <Router>
-        <div className='flex h-screen overflow-hidden'>
-          <Header sidebaropen={sidebaropen} 
-                  setSidebarOpen={setSidebarOpen} 
-                  searchQuery={searchQuery} 
-                  setSearchQuery={setSearchQuery}
-                  view={view}
-                  setView={setView}
-          />
+        <Routes>
+          <Route path='/signup' element={
+            <SignUpForm />
+          } />
 
-          <div className=''>
-            <SidebarBox sidebaropen={sidebaropen} setSidebarOpen={setSidebarOpen}  />
-          </div>
-
-          <div className={`overflow-auto mt-16 w-full max-w-[1480px] flex-col  ${sidebaropen ? 'ml-56' : 'ml-16'} border-4 border-green-500 transition-all duration-300`}>
-            <Routes>
-
-              <Route path='/home' element={
-                <NoteView notes={notes}
-                  inputOpen={inputOpen} 
-                  setInputOpen={setInputOpen}
-                  sidebaropen={sidebaropen} 
-                  setNotes={setNotes} 
-                  setSelectedNote={setSelectedNote}
-                  view={view}
-                   />
-              } />
-
-              <Route path='/archive' element={
-                <ArchiveView notes={notes}
-                  sidebaropen={sidebaropen} 
-                  setNotes={setNotes} 
-                  setSelectedNote={setSelectedNote}
-                  view={view}
-                   />
-              } />
-
-              <Route path='/trash' element={
-                <TrashView notes={notes}
-                  inputOpen={inputOpen} 
-                  setInputOpen={setInputOpen}
-                  sidebaropen={sidebaropen} 
-                  setNotes={setNotes}
-                  view={view} 
-                   />
-              } />
-
-              <Route path='/search' element={
-                <SearchView notes={notes}
-                  sidebaropen={sidebaropen} 
-                  setNotes={setNotes} 
-                  searchQuery={searchQuery}
-                  setSelectedNote={setSelectedNote}
-                />} 
-              />
-
-            </Routes>
-          </div>
-          {
-            selectedNote && 
-              <ModalView selectedNote={selectedNote} 
-                notes={notes} setNotes={setNotes} 
+          <Route path='/signin' element={
+            <SignInForm />
+          } />
+        
+          <Route element={<AppLayout 
+            notes={notes}
+            setNotes={setNotes}
+            sidebaropen={sidebaropen}
+            setSidebarOpen={setSidebarOpen}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            view={view}
+            setView={setView}
+            selectedNote={selectedNote}
+            setSelectedNote={setSelectedNote}
+            showPalette={showPalette}
+            setShowPalette={setShowPalette}
+          />}>
+            <Route path='/home' element={
+              <NoteView notes={notes}
+                setNotes={setNotes}
+                inputOpen={inputOpen}
+                setInputOpen={setInputOpen}
+                sidebaropen={sidebaropen}
                 setSelectedNote={setSelectedNote}
-                showPalette={showPalette}
-                setShowPalette={setShowPalette}
+                view={view}
+                setView={setView}
+                />
+              }
             />
-          }
-        </div>
-      </Router>
+            <Route path='/archive' element={
+              <ArchiveView notes={notes}
+                sidebaropen={sidebaropen}
+                setNotes={setNotes}
+                setSelectedNote={setSelectedNote}
+                view={view}
+              />
+              } 
+            />
+            <Route path='/trash' element={
+              <TrashView notes={notes}
+                inputOpen={inputOpen}
+                setInputOpen={setInputOpen}
+                sidebaropen={sidebaropen}
+                setNotes={setNotes}
+                view={view}
+              />
+              } 
+            />
+            <Route path='/search' element={
+              <SearchView notes={notes}
+                sidebaropen={sidebaropen}
+                setNotes={setNotes}
+                searchQuery={searchQuery}
+                setSelectedNote={setSelectedNote}
+              />}
+            />
+          </Route>
+        </Routes>
+      </Router >
     </>
   )
 }

@@ -105,7 +105,7 @@ export const Card = ({
                     }
             onClick={onCardClick}>
             <div className="flex items-center">
-                <p className=" px-2 font-semibold font-sans text-xl w-full border-b-2 ">
+                <p className=" px-2 font-semibold font-sans text-xl w-full ">
                     {title}
                 </p>
                 <span className="p-2 hover:bg-slate-200 rounded-full"
@@ -117,7 +117,7 @@ export const Card = ({
             <p className="flex-10">
                 {content}
             </p>
-            <div className=" flex justify-around border-t p-1" onClick={(e) => e.stopPropagation()}>
+            <div className=" flex justify-around p-1" onClick={(e) => e.stopPropagation()}>
                 {/* {items.map((item) => (
                     <button key={item.title}
                         title={item.title}
