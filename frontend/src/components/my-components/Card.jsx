@@ -5,23 +5,27 @@ import { RiInboxUnarchiveLine } from "react-icons/ri";
 import { FaTrashRestore } from "react-icons/fa";
 import { Pallete } from "./Pallete";
 import { useState } from "react";
+import StarterKit from '@tiptap/starter-kit'
+import { TextStyle, FontSize } from '@tiptap/extension-text-style';
+import { generateHTML } from '@tiptap/react'
+import  DOMPurify  from 'dompurify'
 
 
-export const Card = ({ 
-    id, 
-    title, 
-    content, 
-    bgColor ,
-    onViewChange, 
-    onCardClick, 
-    viewType, 
-    onDelete, 
-    notes, 
+export const Card = ({
+    id,
+    title,
+    content,
+    bgColor,
+    onViewChange,
+    onCardClick,
+    viewType,
+    onDelete,
+    notes,
     setNotes,
     view,
     pinned
- }) => {/**onCardClick */
-    
+}) => {/**onCardClick */
+
     const [showPalette, setShowPalette] = useState(false);
 
     let items = [];
@@ -82,15 +86,19 @@ export const Card = ({
     }
 
     function handlePinToggle(e) {
-        e.stopPropagation(); 
+        e.stopPropagation();
         const updatedNotes = notes.map((note) => {
-            return note.id === id ? {...note, pinned: !note.pinned} : note;
+            return note.id === id ? { ...note, pinned: !note.pinned } : note;
         });
         setNotes(updatedNotes);
         sessionStorage.setItem('noteList', JSON.stringify(updatedNotes));
     }
 
-
+    function handleSafeHtml(json) {
+        const htmlContent = DOMPurify.sanitize(generateHTML(json, [StarterKit, TextStyle, FontSize]));
+        
+        return htmlContent;
+    }
 
 
     /**
@@ -99,10 +107,10 @@ export const Card = ({
      */
 
     return (
-        <div className={`${view ? 'max-w-screen-lg  my-4 min-h-[100px] w-full': 'sm:max-w-[250px] sm:px-2'} 
+        <div className={`${view ? 'max-w-screen-lg  my-4 min-h-[100px] w-full' : 'sm:max-w-[250px] sm:px-2'} 
                         w-90 border-2 hover:border-blue-500  min-h-[200px] ${bgColor} 
                         rounded-md shadow break-inside-avoid whitespace-pre-wrap flex flex-col justify-between`
-                    }
+        }
             onClick={onCardClick}>
             <div className="flex items-center">
                 <p className=" px-2 font-semibold font-sans text-xl w-full ">
@@ -110,13 +118,13 @@ export const Card = ({
                 </p>
                 <span className="p-2 hover:bg-slate-200 rounded-full"
                     onClick={handlePinToggle}>
-                    {pinned ? <BsPinFill size={18}/> : <BsPin size={18}/>}
+                    {pinned ? <BsPinFill size={18} /> : <BsPin size={18} />}
                 </span>
             </div>
 
-            <p className="flex-10">
-                {content}
-            </p>
+            <p className="flex-10 mx-2" dangerouslySetInnerHTML={{ __html: handleSafeHtml(content) }} />
+
+
             <div className=" flex justify-around p-1" onClick={(e) => e.stopPropagation()}>
                 {/* {items.map((item) => (
                     <button key={item.title}
@@ -138,7 +146,7 @@ export const Card = ({
                                     setShowPalette(s => !s); // Toggle palette
                                 }}
                             >
-                                <item.icon size={20}  />
+                                <item.icon size={20} />
                             </button>
                             {showPalette && (
                                 <Pallete
@@ -156,7 +164,7 @@ export const Card = ({
                             className="text-gray-600 hover:text-black z-10"
                             onClick={(e) => {
                                 e.stopPropagation();
-                                item.view === 'delete'? onDelete(id) : onViewChange(id, item.view);
+                                item.view === 'delete' ? onDelete(id) : onViewChange(id, item.view);
                             }}
                         >
                             <item.icon size={20} />

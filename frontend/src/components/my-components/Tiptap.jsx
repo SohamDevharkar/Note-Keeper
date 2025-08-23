@@ -15,12 +15,12 @@ export function TipTapEditor({ value, onChange, placeholder, className, singleLi
                 depth: 1000,
             }
         }),
-        TextStyle,      // needed for styling marks like font size
+            TextStyle,      // needed for styling marks like font size
         FontSize.configure({ types: ['textStyle'] }),
-    ],
+        ],
         content: value,
         onUpdate: ({ editor }) => {
-            onChange((editor.getText()))
+            onChange(editor.getJSON())
         },
         editorProps: {
             attributes: {
@@ -36,8 +36,8 @@ export function TipTapEditor({ value, onChange, placeholder, className, singleLi
 
     // Sync editor content if prop changes externally
     useEffect(() => {
-        if (editor && value !== editor.getText()) {
-            editor.commands.setContent(value)
+        if (editor && value && value !== editor.getJSON()) {
+            editor.commands.setContent(value);
         }
     }, [value, editor])
 
@@ -55,7 +55,7 @@ function Menubar({ editor }) {
         11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
         21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
         31, 32, 33, 34, 35, 36, 37, 38, 39, 40];
-    
+
     const currentFontSize = editor.getAttributes('textStyle').fontSize || '16px';
 
     return (
