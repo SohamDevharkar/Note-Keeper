@@ -14,6 +14,7 @@ dist-ssr
 assets
 icons
 .env
+__pycache__
 
 # Editor directories and files
 .vscode/*
