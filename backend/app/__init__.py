@@ -2,7 +2,8 @@ from flask import Flask
 from .config import Config
 from .extensions import db
 from .routes.auth import auth_bp
-
+from .models import Users
+from .models import Notes
 
 def create_app() :
     app=Flask(__name__)
@@ -10,11 +11,7 @@ def create_app() :
     app.register_blueprint(auth_bp)
     
     db.init_app(app)
-    
-    from .models import users
-    from .models import notes
-    
-    
+        
     with app.app_context():
         #db.drop_all()
         db.create_all()
