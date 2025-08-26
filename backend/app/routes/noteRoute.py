@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from models import Notes
+from ..models import Notes
 from ..decorators import token_required
 from ..extensions import db
 
@@ -26,7 +26,7 @@ def create_note(user_id):
     return jsonify(new_note.to_dict())
 
 
-@notes_bp.route('/updateNote/<string:note_id', methods=['PATCH'])
+@notes_bp.route('/updateNote/string: note_id', methods=['PATCH'])
 @token_required
 def update_note(user_id, note_id):
     data = request.get_json()
@@ -37,7 +37,7 @@ def update_note(user_id, note_id):
     db.session.commit()
     return jsonify(note.to_dict())
 
-@notes_bp.route('/deleteNote/<string: note_id>', methods=['DELETE'])
+@notes_bp.route('/deleteNote/string: note_id', methods=['DELETE'])
 @token_required
 def delete_note (user_id, note_id):
     note = Notes.query.filter_by(user_id = user_id, id=note_id).first_or_404

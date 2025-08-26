@@ -1,7 +1,7 @@
 from flask import jsonify, request
 import jwt 
-from config import secret
-from models import notes, users
+from .config import secret
+from .models import Notes, Users
 
 def token_required(f):
     # This decorator manually checks JWT and sets user info for protected routes

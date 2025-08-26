@@ -7,10 +7,12 @@ import { SearchView } from './pages/SearchView.jsx';
 import { AppLayout } from './pages/AppLayout.jsx';
 import { SignUpForm } from './pages/SignUpPg.jsx';
 import { SignInForm } from './pages/SignInPg.jsx';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
+const queryClient = new QueryClient();
 
 function App() {
-
+  const [loginState, setLoginState] = useState(false);
   const [sidebaropen, setSidebarOpen] = useState(false);
   const [notes, setNotes] = useState(() => {
     const noteList = sessionStorage.getItem('noteList')
@@ -23,7 +25,7 @@ function App() {
   const [view, setView] = useState(false);
 
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
           <Route path='/signup' element={
@@ -31,7 +33,7 @@ function App() {
           } />
 
           <Route path='/signin' element={
-            <SignInForm />
+            <SignInForm loginState={loginState} setLoginState={setLoginState} />
           } />
         
           <Route element={<AppLayout 
@@ -47,6 +49,8 @@ function App() {
             setSelectedNote={setSelectedNote}
             showPalette={showPalette}
             setShowPalette={setShowPalette}
+            loginState={loginState}
+            setLoginState={setLoginState}
           />}>
             <Route path='/home' element={
               <NoteView notes={notes}
@@ -90,7 +94,7 @@ function App() {
           </Route>
         </Routes>
       </Router >
-    </>
+    </QueryClientProvider>
   )
 }
 

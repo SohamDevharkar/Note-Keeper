@@ -15,7 +15,9 @@ export const AppLayout = ({
     selectedNote,
     setSelectedNote,
     showPalette,
-    setShowPalette
+    setShowPalette,
+    loginState,
+    setLoginState
 }) => {
     return (
         <>
@@ -26,6 +28,8 @@ export const AppLayout = ({
                     setSearchQuery={setSearchQuery}
                     view={view}
                     setView={setView}
+                    loginState={loginState} 
+                    setLoginState={setLoginState}
                 />
                 <SidebarBox sidebaropen={sidebaropen} setSidebarOpen={setSidebarOpen} />
                 <div className={`overflow-auto mt-16 w-full max-w-[1480px] flex-col  ${sidebaropen ? 'ml-56' : 'ml-16'} border-4 border-green-500 transition-all duration-300`}>

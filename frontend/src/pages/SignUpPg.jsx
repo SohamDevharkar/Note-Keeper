@@ -1,13 +1,38 @@
 import { useForm } from "react-hook-form";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios'
+import { useNavigate } from "react-router-dom";
 
 export function SignUpForm() {
     const { register, handleSubmit, formState: { errors }, reset } = useForm();
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+
+    // axios data fetcher
+    const newUserAPI = async (userData) => {
+        const response = await axios.post('http://127.0.0.1:5000/auth/signup', userData);
+        return response.data;
+    }
+
+    // setting up useMutation with signup api
+    const { mutate, isLoading, isError, error, isSuccess } = useMutation({
+        mutationFn: newUserAPI,
+        onSucces: () => {
+            queryClient.invalidateQueries(['users']);
+
+        },
+
+        onError: () => console.log("Failed to create user", error)
+    })
 
     const handleOnSubmit = (data) => {
-
         const { firstName, lastName, email, password } = data;
         console.log("sign up data: ", JSON.stringify(data));
+        //
+        mutate(data);
+        // alert("User signed up!");
         reset();
+        navigate('/signin');
     }
 
     return (
@@ -28,7 +53,7 @@ export function SignUpForm() {
                                         value: /^[a-zA-Z]+$/,
                                         message: "Numbers and special character not allowed."
                                     }
-                                })} 
+                                })}
                             />
                             {errors.firstName && <p className={`fonst-sans text-xs font-light text-red-500 mt-2 ${!errors.lastName ? 'mr-55' : null} ml-6`}>{errors.firstName.message}</p>}
                         </div>
@@ -41,7 +66,7 @@ export function SignUpForm() {
                                         value: /^[a-zA-Z\s]+$/,
                                         message: "Numbers and special character not allowed."
                                     }
-                                })} 
+                                })}
                             />
                             {errors.lastName && <p className={`fonst-sans text-xs font-light text-red-500 mt-2 ${!errors.firstName ? 'ml-55' : null} mr-6`}>{errors.lastName.message}</p>}
                         </div>
@@ -87,13 +112,19 @@ export function SignUpForm() {
                 </div>
 
                 <div className="flex justify-between h-10 items-center my-2">
-                    <button type="submit" className="border-4 w-22 h-full rounded-lg ml-20"
+                    <button type="submit" className="border-4 w-22 h-full rounded-lg ml-20" disabled={isLoading}
                     >
-                        Submit
+                        {isLoading ? 'Creating...' : 'Submit'}
                     </button>
                     <button className="border-4 w-22 h-full rounded-lg mr-20">
                         Close
                     </button>
+
+
+                </div>
+                <div>
+                    {isError && <div className={`fonst-sans text-xs font-light text-red-500`}> Error: {error.message}</div>}
+                    {isSuccess && <div className="fonst-sans text-xs font-light bg-green-500">User Created successfullly</div>}
                 </div>
             </form>
         </div>

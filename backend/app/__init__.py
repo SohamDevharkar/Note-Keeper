@@ -1,19 +1,24 @@
 from flask import Flask
+from flask_cors import CORS
 from .config import Config
 from .extensions import db
 from .routes.auth import auth_bp
+from .routes.noteRoute import notes_bp
 from .models import Users
 from .models import Notes
 
 def create_app() :
     app=Flask(__name__)
     app.config.from_object(Config) #Load config from config.py
+    CORS(app, origins=["http://localhost:5173"])
     app.register_blueprint(auth_bp)
+    app.register_blueprint(notes_bp)
+    
     
     db.init_app(app)
         
     with app.app_context():
-        #db.drop_all()
+        # db.drop_all()
         db.create_all()
     
     return app

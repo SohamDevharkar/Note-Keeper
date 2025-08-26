@@ -1,12 +1,40 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from 'axios';
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
-export function SignInForm() {
+
+export function SignInForm({loginState, setLoginState}) {
     const { register, handleSubmit, formState: { errors }, reset} = useForm();
+    const queryClient = useQueryClient();
+    const navigate = useNavigate();
+    const [loginError, setLoginError] = useState(false);
+
+    const signinAPI = async (userData) => {
+        const response = await axios.post('http://127.0.0.1:5000/auth/signin', userData);
+        console.log("response.data: " + JSON.stringify(response.data))
+        return response.data;
+    }
+
+    // setting up useMutation with signup api
+    const { mutate, isLoading, isError, error, isSuccess } = useMutation({
+        mutationFn: signinAPI,
+        onSuccess: (data) => { console.log(data.token)
+            sessionStorage.setItem('token', data.token);
+            sessionStorage.setItem('username',data.username);
+            setLoginState(true)
+            queryClient.invalidateQueries(['users']);
+        },
+        onError: () => console.log("Failed to create user", error.cause)
+    })
 
     const handleOnSubmit = (data) => {
         console.log("Sign in data: " + JSON.stringify(data));
+        mutate(data)
+        console.log("should be false on failed login: ", isSuccess)
         reset();
+        loginState ? navigate('/home') : setLoginError(true) ;
     }
 
     return (
@@ -45,6 +73,8 @@ export function SignInForm() {
                     />
                     {errors.password && <p className={`font-sans text-xs font-light text-red-500 flex justify-center`}>{errors.password.message}</p>}
                 </div>
+                
+                {loginError && <p className="font-sans text-xs font-light text-red-500 flex justify-center">Incorrect email or password</p>}
 
                 <div className="flex h-10 justify-center my-4">
                     <button className="border-2 w-22 h-full rounded-lg">

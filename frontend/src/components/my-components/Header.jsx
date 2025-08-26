@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FiMenu } from "react-icons/fi"
 import { LuSearch } from "react-icons/lu";
 import { FaStickyNote } from "react-icons/fa";
@@ -8,12 +8,47 @@ import { FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { TbLayoutList } from "react-icons/tb"; // list view icon
 
-export const Header = ({ sidebaropen, setSidebarOpen, searchQuery, setSearchQuery, view, setView }) => {
+export const Header = ({ 
+    sidebaropen, 
+    setSidebarOpen, 
+    searchQuery, 
+    setSearchQuery, 
+    view, 
+    setView,
+    loginState,
+    setLoginState}) => {
 
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
     const navigate = useNavigate();
-
+    const username = sessionStorage.getItem('username') || 'username';
+    const [menuOpen, setMenuOpen] = useState(false);
+    const menuRef = useRef();
     const route = '/search';
+
+    function handleLogout() {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('username');
+        setLoginState(false)
+        setMenuOpen(false)
+        navigate('/signin')
+    }
+
+    useEffect(() => {
+        function handleClickOutSide(event) {
+            if(menuRef.current && !menuRef.current.contains(event.target)) {
+                setMenuOpen(false);
+            }
+        }
+
+        if(menuOpen) {
+            document.addEventListener("mousedowm", handleClickOutSide);
+        } else {
+            document.removeEventListener("mousedown", handleClickOutSide);
+        }
+
+        return () => document.removeEventListener("mousedown", handleClickOutSide);
+
+    }, [menuOpen])
 
     return (
         <header className="flex items-center justify-between h-16 w-full px-4 bg-background border-b gap-6 fixed top-0 left-0 right-0 z-10 shadow-sm">
@@ -92,8 +127,31 @@ export const Header = ({ sidebaropen, setSidebarOpen, searchQuery, setSearchQuer
                 </div>
 
                 {/**Avator Icon */}
-                <div className=" rounded-full w-8 h-8 flex items-center justify-center hover:bg-slate-200 transition">
+                <div className=" rounded-full w-8 h-8 flex items-center justify-center hover:bg-slate-200 transition"
+                    onClick={() => setMenuOpen(!menuOpen)}
+                    aria-haspopup="true"
+                    aria-expanded={menuOpen}
+                >
                     <FaUser size={22} />
+                    {
+                        menuOpen && (
+                            <div ref={menuRef}
+                                className="absolute flex flex-col justify-center items-center h-90 right-3 top-16  w-[400px] bg-slate-50 rounded shadow-lg p-4 text-sm z-50">
+                                    <div className="bg-slate-500 rounded-full h-25 w-25 border-4 -translate-y-16">
+                                        <FaUser size={60} className="mx-3.75 my-3.5"/>
+                                    
+                                        <div className="m-6 font-semibold w-60 -translate-x-14 px-3 text-slate-500 text-lg flex break-inside-avoid whitespace-pre-wrap">
+                                            Hello {username}
+                                        </div>
+                                        <button onClick={()=>handleLogout()}
+                                            className="w-full text-left px-4 py-2 rounded-md hover:bg-gray-200 border-4"
+                                        >
+                                        Log Out
+                                    </button>
+                                    </div>
+                            </div>
+                        )
+                    }
                 </div>
             </div>
         </header>

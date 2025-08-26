@@ -1,8 +1,7 @@
 from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from ..extensions import db
-from ..models.users import Users
-import uuid
+from ..models.Users import Users
 import jwt
 from datetime import datetime, timedelta, timezone
 
@@ -35,13 +34,13 @@ def signup():
 @auth_bp.route('/signin', methods=['POST'])
 def signin():
     data = request.json
-    if not data or not all(k in data for k in ('userName', 'password')):
-        return jsonify({'message': 'Missing username or password'}), 400
+    if not data or not all(k in data for k in ('email', 'password')):
+        return jsonify({'message': 'Missing email or password'}), 400
     
-    user = Users.query.filter_by(userName=data['userName']).first()
-    
+    user = Users.query.filter_by(email=data['email']).first()
+
     if user is None or not check_password_hash(user.password_hash, data['password']):
-        return jsonify({'message' : 'Invalid userName or password'}), 401
+        return jsonify({'message' : 'Invalid email or password'}), 401
     
     # Generating token for 1 hr
     token = jwt.encode({
@@ -49,4 +48,7 @@ def signin():
         'expire': (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
     }, current_app.config['SECRET_KEY'], algorithm='HS256')
     
-    return jsonify({'token': token})
+    return jsonify({'token': token,
+                    'username': f'{user.firstName} {user.lastName}'} )
+    
+    

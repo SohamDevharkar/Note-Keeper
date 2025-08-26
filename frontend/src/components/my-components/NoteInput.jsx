@@ -58,7 +58,10 @@ export const NoteInput = ({setNotes, inputOpen, setInputOpen}) => {
         }
         const existingNotes = JSON.parse(sessionStorage.getItem('noteList')) || [];
         const updatedNotes = [...existingNotes, newNote];
-        sessionStorage.setItem('noteList', JSON.stringify(updatedNotes));
+        // sessionStorage.setItem('noteList', JSON.stringify(updatedNotes));
+
+        // storing notesList in indexed db.
+        
         setNotes(updatedNotes)
         console.log("Note saved: ", {id: newNote.id, title: title, content: content });  
     }
