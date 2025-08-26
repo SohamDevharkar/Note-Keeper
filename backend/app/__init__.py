@@ -4,8 +4,8 @@ from .config import Config
 from .extensions import db
 from .routes.auth import auth_bp
 from .routes.noteRoute import notes_bp
-from .models import Users
-from .models import Notes
+from .models import users
+from .models import notes
 
 def create_app() :
     app=Flask(__name__)

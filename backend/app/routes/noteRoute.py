@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from ..models import Notes
+from ..models.notes import Notes
 from ..decorators import token_required
 from ..extensions import db
 

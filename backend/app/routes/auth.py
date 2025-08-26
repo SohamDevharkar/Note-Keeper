@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from ..extensions import db
-from ..models.Users import Users
+from ..models.users import Users
 import jwt
 from datetime import datetime, timedelta, timezone
 
