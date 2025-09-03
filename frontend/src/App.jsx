@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { NoteView } from './pages/NoteView.jsx';
 import { ArchiveView } from './pages/ArchiveView.jsx';
@@ -8,35 +8,51 @@ import { AppLayout } from './pages/AppLayout.jsx';
 import { SignUpForm } from './pages/SignUpPg.jsx';
 import { SignInForm } from './pages/SignInPg.jsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { LandingPage } from './pages/LandingPage.jsx';
+import { ProtectedRoutes } from './components/my-components/ProtectedRoutes.jsx';
 
 const queryClient = new QueryClient();
 
 function App() {
   const [loginState, setLoginState] = useState(false);
   const [sidebaropen, setSidebarOpen] = useState(false);
-  const [notes, setNotes] = useState(() => {
-    const noteList = sessionStorage.getItem('noteList')
-    return noteList ? JSON.parse(noteList) : []
-  });
+  const [notes, setNotes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
   const [inputOpen, setInputOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showPalette, setShowPalette] = useState(false);
   const [view, setView] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return sessionStorage.getItem('theme') === 'dark';
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDarkMode) {
+      root.classList.add('dark');
+      sessionStorage.setItem('theme', 'dark');
+    } else {
+      root.classList.remove('dark');
+      sessionStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
 
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
+          <Route path='/' element={<LandingPage />} />
+
           <Route path='/signup' element={
             <SignUpForm />
           } />
 
           <Route path='/signin' element={
-            <SignInForm loginState={loginState} setLoginState={setLoginState} />
+            <SignInForm loginState={loginState} setLoginState={setLoginState}
+              isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
           } />
-        
-          <Route element={<AppLayout 
+
+          <Route element={<AppLayout
             notes={notes}
             setNotes={setNotes}
             sidebaropen={sidebaropen}
@@ -51,45 +67,57 @@ function App() {
             setShowPalette={setShowPalette}
             loginState={loginState}
             setLoginState={setLoginState}
+            isDarkMode={isDarkMode}
+            setIsDarkMode={setIsDarkMode}
           />}>
             <Route path='/home' element={
-              <NoteView notes={notes}
-                setNotes={setNotes}
-                inputOpen={inputOpen}
-                setInputOpen={setInputOpen}
-                sidebaropen={sidebaropen}
-                setSelectedNote={setSelectedNote}
-                view={view}
-                setView={setView}
+              <ProtectedRoutes>
+                <NoteView notes={notes}
+                  setNotes={setNotes}
+                  inputOpen={inputOpen}
+                  setInputOpen={setInputOpen}
+                  sidebaropen={sidebaropen}
+                  setSelectedNote={setSelectedNote}
+                  view={view}
+                  setView={setView}
                 />
-              }
+              </ProtectedRoutes>
+            }
             />
             <Route path='/archive' element={
-              <ArchiveView notes={notes}
-                sidebaropen={sidebaropen}
-                setNotes={setNotes}
-                setSelectedNote={setSelectedNote}
-                view={view}
-              />
-              } 
+              <ProtectedRoutes>
+                <ArchiveView notes={notes}
+                  sidebaropen={sidebaropen}
+                  setNotes={setNotes}
+                  setSelectedNote={setSelectedNote}
+                  view={view}
+                />
+              </ProtectedRoutes>
+
+            }
             />
             <Route path='/trash' element={
-              <TrashView notes={notes}
-                inputOpen={inputOpen}
-                setInputOpen={setInputOpen}
-                sidebaropen={sidebaropen}
-                setNotes={setNotes}
-                view={view}
-              />
-              } 
+              <ProtectedRoutes>
+                <TrashView notes={notes}
+                  inputOpen={inputOpen}
+                  setInputOpen={setInputOpen}
+                  sidebaropen={sidebaropen}
+                  setNotes={setNotes}
+                  view={view}
+                />
+              </ProtectedRoutes>
+            }
             />
             <Route path='/search' element={
-              <SearchView notes={notes}
-                sidebaropen={sidebaropen}
-                setNotes={setNotes}
-                searchQuery={searchQuery}
-                setSelectedNote={setSelectedNote}
-              />}
+              <ProtectedRoutes>
+                <SearchView notes={notes}
+                  sidebaropen={sidebaropen}
+                  setNotes={setNotes}
+                  searchQuery={searchQuery}
+                  setSelectedNote={setSelectedNote}
+                />
+              </ProtectedRoutes>
+            }
             />
           </Route>
         </Routes>

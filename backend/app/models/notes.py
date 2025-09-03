@@ -24,3 +24,15 @@ class Notes(db.Model) :
          # Helper method to get string representation of UUID for display
         # return str(uuid.UUID(bytes=self.id)) 
         return self.id
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'content': self.content,
+            'view': self.view,
+            'prevView': self.prevView,
+            'bgColor': self.bgColor,
+            'pinned': self.pinned,
+            'user_id': self.user_id
+        } 

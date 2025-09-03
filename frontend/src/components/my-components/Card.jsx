@@ -9,6 +9,8 @@ import StarterKit from '@tiptap/starter-kit'
 import { TextStyle, FontSize } from '@tiptap/extension-text-style';
 import { generateHTML } from '@tiptap/react'
 import  DOMPurify  from 'dompurify'
+import { useNoteUpdateMutation } from "../../hooks/useNoteUpdateMutation";
+import { useQueryClient } from "@tanstack/react-query";
 
 
 export const Card = ({
@@ -24,9 +26,13 @@ export const Card = ({
     setNotes,
     view,
     pinned
-}) => {/**onCardClick */
+}) => {
 
     const [showPalette, setShowPalette] = useState(false);
+    const queryClient = useQueryClient();
+    const userName = sessionStorage.getItem('username');
+    const updateNoteMutation = useNoteUpdateMutation(userName, setNotes, queryClient);
+
 
     let items = [];
 
@@ -81,34 +87,23 @@ export const Card = ({
                 icon: IoColorPaletteOutline
 
             }
-
         ]
     }
 
     function handlePinToggle(e) {
         e.stopPropagation();
-        const updatedNotes = notes.map((note) => {
-            return note.id === id ? { ...note, pinned: !note.pinned } : note;
-        });
-        setNotes(updatedNotes);
-        sessionStorage.setItem('noteList', JSON.stringify(updatedNotes));
+        const selectedNote = notes.find(note => note.id === id);
+        updateNoteMutation.mutate({ ...selectedNote, pinned: !selectedNote.pinned });
     }
 
     function handleSafeHtml(json) {
         const htmlContent = DOMPurify.sanitize(generateHTML(json, [StarterKit, TextStyle, FontSize]));
-        
         return htmlContent;
     }
 
-
-    /**
-     * {`w-96 border-4 border-blue-500 sm:max-w-[250px] lg:w-70 sm:px-2 sm:mx-2 min-h-[200px] ${bgColor} 
-        rounded-md shadow break-inside-avoid whitespace-pre-wrap flex flex-col justify-between p-4`}
-     */
-
     return (
         <div className={`${view ? 'max-w-screen-lg  my-4 min-h-[100px] w-full' : 'sm:max-w-[250px] sm:px-2'} 
-                        w-90 border-2 hover:border-blue-500  min-h-[200px] ${bgColor} 
+                        w-90 border-3 hover:border-red-500 min-h-[200px] ${bgColor} transition-all duration-300 dark:text-black
                         rounded-md shadow break-inside-avoid whitespace-pre-wrap flex flex-col justify-between`
         }
             onClick={onCardClick}>
@@ -116,7 +111,7 @@ export const Card = ({
                 <p className=" px-2 font-semibold font-sans text-xl w-full ">
                     {title}
                 </p>
-                <span className="p-2 hover:bg-slate-200 rounded-full"
+                <span className="p-2 hover:bg-slate-50 rounded-full"
                     onClick={handlePinToggle}>
                     {pinned ? <BsPinFill size={18} /> : <BsPin size={18} />}
                 </span>
@@ -124,16 +119,7 @@ export const Card = ({
 
             <p className="flex-10 mx-2" dangerouslySetInnerHTML={{ __html: handleSafeHtml(content) }} />
 
-
             <div className=" flex justify-around p-1" onClick={(e) => e.stopPropagation()}>
-                {/* {items.map((item) => (
-                    <button key={item.title}
-                        title={item.title}
-                        className="text-gray-600 hover:text-black"
-                        onClick={item.view === 'delete' ? () => {onDelete(id)} : () => { onViewChange(id, item.view)}}>
-                        <item.icon size={20} />
-                    </button>
-                ))} */}
 
                 {items.map((item) => (
                     item.title === 'theme' ? (
@@ -171,8 +157,6 @@ export const Card = ({
                         </button>
                     )
                 ))}
-
-
             </div>
         </div>
     )

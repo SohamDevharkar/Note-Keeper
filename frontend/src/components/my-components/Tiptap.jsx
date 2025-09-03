@@ -59,12 +59,12 @@ function Menubar({ editor }) {
     const currentFontSize = editor.getAttributes('textStyle').fontSize || '16px';
 
     return (
-        <div className={`flex px-2 gap-2 bg-white w-50 translate-x-40 rounded-lg`}>
+        <div className={`flex px-2 gap-2 bg-white w-45 translate-x-40 rounded-lg dark:text-black`}>
             {/* Formatting (Bold as example; replace with dropdown for full menu) */}
             <button
                 title="Bold"
                 type="button"
-                className={`${editor.isActive('bold') ? 'bg-gray-300' : ''} px-1 py-1 hover:bg-gray-300 rounded-4xl`}
+                className={`${editor.isActive('bold') ? 'bg-gray-300' : ''} px-1 py-1 hover:bg-gray-300 rounded-full`}
                 onClick={() => editor.chain().focus().toggleBold().run()}
             >
                 <FaBold />
@@ -74,7 +74,7 @@ function Menubar({ editor }) {
             <button
                 title="Underline"
                 type="button"
-                className={`${editor.isActive('underline') ? 'bg-gray-300' : ''} px-1 py-1 hover:bg-gray-300 rounded-4xl`}
+                className={`${editor.isActive('underline') ? 'bg-gray-300' : ''} px-1 py-1 hover:bg-gray-300 rounded-full`}
                 onClick={() => editor.chain().focus().toggleUnderline().run()}
             >
                 <ImUnderline />
@@ -84,7 +84,7 @@ function Menubar({ editor }) {
             <button
                 title="Italic"
                 type="button"
-                className={`${editor.isActive('italic') ? 'bg-gray-300' : ''} px-1 py-1 hover:bg-gray-300 rounded-4xl`}
+                className={`${editor.isActive('italic') ? 'bg-gray-300' : ''} px-1 py-1 hover:bg-gray-300 rounded-full`}
                 onClick={() => editor.chain().focus().toggleItalic().run()}
             >
                 <FiItalic />
@@ -92,22 +92,6 @@ function Menubar({ editor }) {
 
             {/* font size*/}
             <div className='flex items-center gap-1'>
-                {/* <span className='text-sm w-15'>font size:</span>
-                <select className='w-12 ml-0 py-0.5 max-height: 150px overflow-y: auto' aria-label='Select font size'
-                    value={currentFontSize.replace('px', '')}
-                    onChange={e => {
-                        const size = e.target.value;
-                        if (size === '') {
-                            editor.chain().focus().unsetFontSize().run();
-                        } else {
-                            editor.chain().focus().setFontSize(size + 'px').run();
-                        }
-                    }} >
-                    <option value="">${currentFontSize.replace('px','')}</option>
-                    {fontSizes.map(size => (
-                        <option key={size} value={size}>{size}</option>
-                    ))}
-                </select> */}
                 <FontSizeCounter editor={editor} min={8} max={40} step={1} />
             </div>
         </div>

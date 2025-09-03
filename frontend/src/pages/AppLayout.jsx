@@ -17,7 +17,9 @@ export const AppLayout = ({
     showPalette,
     setShowPalette,
     loginState,
-    setLoginState
+    setLoginState,
+    isDarkMode,
+    setIsDarkMode
 }) => {
     return (
         <>
@@ -30,9 +32,16 @@ export const AppLayout = ({
                     setView={setView}
                     loginState={loginState} 
                     setLoginState={setLoginState}
+                    isDarkMode={isDarkMode}
+                    setIsDarkMode={setIsDarkMode}
+
                 />
-                <SidebarBox sidebaropen={sidebaropen} setSidebarOpen={setSidebarOpen} />
-                <div className={`overflow-auto mt-16 w-full max-w-[1480px] flex-col  ${sidebaropen ? 'ml-56' : 'ml-16'} border-4 border-green-500 transition-all duration-300`}>
+                <SidebarBox sidebaropen={sidebaropen} 
+                    setSidebarOpen={setSidebarOpen} 
+                    isDarkMode={isDarkMode}
+                    setIsDarkMode={setIsDarkMode}
+                />
+                <div className={`overflow-auto mt-16 w-full max-w-[1480px] flex-col  ${sidebaropen ? 'ml-56' : 'ml-16'} transition-all duration-300`}>
                     <Outlet/>
                 </div>
                 {

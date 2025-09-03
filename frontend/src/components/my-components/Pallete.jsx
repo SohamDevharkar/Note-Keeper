@@ -1,4 +1,8 @@
-export const Pallete = ({ id, setShowPalette, setColor, notes, setNotes }) => {
+import { useQueryClient } from "@tanstack/react-query";
+import { useNoteUpdateMutation } from "../../hooks/useNoteUpdateMutation";
+import { useEffect } from "react";
+
+export const Pallete = ({ id, setShowPalette, setBgColor, notes, setNotes }) => {
     //{ id, showPalette, setShowPalette, notes, setNotes, setSelectedNote}
     const Colors = [
         'bg-white',
@@ -9,27 +13,59 @@ export const Pallete = ({ id, setShowPalette, setColor, notes, setNotes }) => {
         'bg-purple-300',
     ]
 
-    const onColorChange = (id, targetColor) => {
-        if (setColor) {
-            //updating  bg-color locally for modal view container
-            setColor(targetColor);
-        } else {
-            // updating globally for note cards.
+    const queryClient = useQueryClient();
+    const userName = sessionStorage.getItem('username')
+    const updateNoteMutation = useNoteUpdateMutation(userName, setNotes, queryClient);
+
+    const onColorChange = (targetColor) => {
+        // if (setBgColor) {
+        //     //updating  bg-color locally for modal
+        //     setBgColor(targetColor);
+        //     setShowPalette(false)
+            
+        // } else {
+        //     // updating globally for note cards.
+        //     console.log("Checking notes state variable", + notes);
+        //     const updatedNotes = notes.map((note) => {
+        //         if (id === note.id) {
+        //             const updatedNoteWithBgColor = { ...note, bgColor: targetColor }
+        //             updateNoteMutation.mutate(updatedNoteWithBgColor);
+        //             // return { ...note, bgColor: targetColor }
+        //             return updatedNoteWithBgColor
+        //         }
+        //         return note;
+        //     })
+        //     setNotes(updatedNotes);            
+        // }
+        // setShowPalette(false);
+
+        if(id && notes && setNotes) {
+            console.log("Checking notes state variable", + notes);
             const updatedNotes = notes.map((note) => {
                 if (id === note.id) {
-                    return { ...note, color: targetColor }
+                    const updatedNoteWithBgColor = { ...note, bgColor: targetColor }
+                    updateNoteMutation.mutate(updatedNoteWithBgColor);
+                    // return { ...note, bgColor: targetColor }
+                    return updatedNoteWithBgColor
                 }
                 return note;
             })
-            setNotes(updatedNotes);
-            sessionStorage.setItem("noteList", JSON.stringify(updatedNotes));
+            setNotes(updatedNotes); 
         }
-        setShowPalette(false);
+
+        if(setBgColor) {
+            console.log("changing bgcolor for either modal or noteinput.");
+            setBgColor(targetColor);
+        }
+
+        if(setShowPalette) {
+            setShowPalette(false);
+        }
     }
 
     return (
-        <div className="absolute bottom-full  left-1/2 -translate-x-1/2 
-                flex border-0 opacity-100 rounded bg-white shadow ">
+        <div className={` ${id ? 'absolute bottom-full  left-1/2 -translate-x-1/2 flex border-0 opacity-100 rounded bg-white shadow' 
+        : 'absolute bottom-full right-1/2 -translate-x-1/2  translate-y-56 flex border-0 opacity-100 rounded bg-white shadow'}`}>
             {
                 Colors.map((color) => (
                     <button
@@ -39,9 +75,9 @@ export const Pallete = ({ id, setShowPalette, setColor, notes, setNotes }) => {
                         onClick={(e) => {
                             e.stopPropagation();
                             setShowPalette(false)
-                            onColorChange(id, color);
+                            onColorChange(color);
                             
-                            console.log("modal expected color: " + color);
+                            // console.log("modal expected color: " + color);
                             // update local modal color only'
 
                             setShowPalette(false);

@@ -1,5 +1,8 @@
 import { BsTrash } from "react-icons/bs"
 import { NoteLayout } from "../components/my-components/NoteLayout";
+import { useQueryClient } from "@tanstack/react-query";
+import { useFetchAndLoad } from "../hooks/useFetchAndLoad";
+import { useEffect } from "react";
 
 export const TrashView = ({
     notes,
@@ -8,6 +11,16 @@ export const TrashView = ({
     view,
 }) => {
 
+    const queryClient = useQueryClient()
+    const userName = sessionStorage.getItem('username');
+    const { data, isLoading, error, isError } = useFetchAndLoad(queryClient, userName);
+
+    useEffect(() => {
+        if (data && data.length > 0) {
+            setNotes(data);
+        }
+    }, [data, setNotes])
+
     const filteredTrashNotes = notes.filter((note) => note.view === 'trash');
 
     function isArrayNullOrEmpty(filteredTrashNotes) {
@@ -15,6 +28,9 @@ export const TrashView = ({
     }
 
     console.log("isArrayNullOrEmpty: " + isArrayNullOrEmpty(filteredTrashNotes));
+
+    if (isLoading) return <div>Loading notes....</div>
+    if (isError) return <div>Error Loading notes</div>
 
     return <div className={`${isArrayNullOrEmpty(filteredTrashNotes) ? 'fixed' : 'relative'} border-4  p-2 border-purple-600 sm:w-full`}>
         {

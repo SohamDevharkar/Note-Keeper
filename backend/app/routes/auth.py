@@ -4,6 +4,11 @@ from ..extensions import db
 from ..models.users import Users
 import jwt
 from datetime import datetime, timedelta, timezone
+from ..errors.exceptions.UnAuthException import UnAuthException
+from ..errors.exceptions.InvalidInputExcaption import InvalidInputException
+from ..errors.exceptions.TokenCreationException import TokenCreationException
+from ..errors.exceptions.DuplicateEntryException import DuplicateEntryException
+from ..errors.exceptions.UserCreationException import UserCreationException
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -13,21 +18,35 @@ def signup():
     required_fields = {'firstName', 'lastName', 'userName', 'email', 'password'}
     
     if not data or not all(field in data for field in required_fields):
-        return jsonify({'message' : 'Missing required fields'}),400
+        # return jsonify({
+        #     'error': 'Missing fields',
+        #     'message' : 'Missing required fields'}),400
+        raise InvalidInputException("Missing required fields")
     
     if Users.query.filter((Users.userName == data['userName']) | (Users.email == data['email'])).first() :
-        return jsonify({'message': 'Username or Email already exists'}), 400
+        # return jsonify({
+        #     'error':'Duplicate entry',
+        #     'message': 'Username or Email already exists'}), 400
+        raise DuplicateEntryException('User with given Username or Email already exists')
     
-    new_user = Users(
-        firstName = data['firstName'],
-        lastName = data['lastName'],
-        userName = data['userName'],
-        email = data['email']
-    )
-    
-    new_user.password_hash = generate_password_hash(data['password'])
-    db.session.add(new_user)
-    db.session.commit()
+    try :
+        new_user = Users(
+            firstName = data['firstName'],
+            lastName = data['lastName'],
+            userName = data['userName'],
+            email = data['email']
+        )
+
+        new_user.password_hash = generate_password_hash(data['password'])
+        db.session.add(new_user)
+        db.session.commit()
+    except Exception as e:
+        # return jsonify({
+        #     'error': 'Commit failed',
+        #     'message': 'Failed to create User'
+        # })
+        print(e)
+        raise UserCreationException("Failed to create Usesr")
     
     return jsonify({'message': 'User creadted', 'user_id': new_user.hex_id()}), 201
 
@@ -35,20 +54,30 @@ def signup():
 def signin():
     data = request.json
     if not data or not all(k in data for k in ('email', 'password')):
-        return jsonify({'message': 'Missing email or password'}), 400
+        # return jsonify({
+        #     'error':'Missing credentials',
+        #     'message': 'Missing email or password'
+        #     }), 400
+        raise InvalidInputException("Missing email or password")
     
     user = Users.query.filter_by(email=data['email']).first()
 
     if user is None or not check_password_hash(user.password_hash, data['password']):
-        return jsonify({'message' : 'Invalid email or password'}), 401
+        # return jsonify({
+        #     'error' : 'Invalid_credentials',
+        #     'message' : 'Invalid email or password'
+        #     }), 401
+        raise UnAuthException("Invalid email or password")
     
-    # Generating token for 1 hr
-    token = jwt.encode({
-        'user_id': user.hex_id(),
-        'expire': (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
-    }, current_app.config['SECRET_KEY'], algorithm='HS256')
-    
-    return jsonify({'token': token,
-                    'username': f'{user.firstName} {user.lastName}'} )
-    
+    try:
+        # Generating token for 1 hr
+        token = jwt.encode({
+            'user_id': user.hex_id(),
+            'expire': (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
+        }, current_app.config['SECRET_KEY'], algorithm='HS256')
+
+        return jsonify({'token': token,
+                        'username': f'{user.firstName} {user.lastName}'} )
+    except:
+        raise TokenCreationException("Failed to create token")
     

@@ -5,11 +5,10 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 
-export function SignInForm({loginState, setLoginState}) {
+export function SignInForm({loginState, setLoginState, isDarkMode, setIsDarkMode}) {
     const { register, handleSubmit, formState: { errors }, reset} = useForm();
     const queryClient = useQueryClient();
     const navigate = useNavigate();
-    const [loginError, setLoginError] = useState(false);
 
     const signinAPI = async (userData) => {
         const response = await axios.post('http://127.0.0.1:5000/auth/signin', userData);
@@ -23,8 +22,8 @@ export function SignInForm({loginState, setLoginState}) {
         onSuccess: (data) => { console.log(data.token)
             sessionStorage.setItem('token', data.token);
             sessionStorage.setItem('username',data.username);
-            setLoginState(true)
             queryClient.invalidateQueries(['users']);
+            navigate('/home')
         },
         onError: () => console.log("Failed to create user", error.cause)
     })
@@ -34,13 +33,13 @@ export function SignInForm({loginState, setLoginState}) {
         mutate(data)
         console.log("should be false on failed login: ", isSuccess)
         reset();
-        loginState ? navigate('/home') : setLoginError(true) ;
+    
     }
 
     return (
         <div className="fixed inset-0 flex flex-col justify-center items-center
-            bg-slate-300">
-            <form className="bg-white h-80 w-90 rounded-xl py-2"
+            bg-gradient-to-br from-yellow-100 to-orange-200 dark:from-gray-800 dark:to-gray-700">
+            <form className="bg-white h-80 w-90 rounded-xl py-2 dark:bg-gray-700"
                 onSubmit={handleSubmit(handleOnSubmit)}>
                 <header className="flex justify-center text-lg my-2 font-bold p-2">
                     Sign In
@@ -73,8 +72,8 @@ export function SignInForm({loginState, setLoginState}) {
                     />
                     {errors.password && <p className={`font-sans text-xs font-light text-red-500 flex justify-center`}>{errors.password.message}</p>}
                 </div>
-                
-                {loginError && <p className="font-sans text-xs font-light text-red-500 flex justify-center">Incorrect email or password</p>}
+
+                {isError && <p className="font-sans text-xs font-light text-red-500 flex justify-center">Incorrect email or password</p>}
 
                 <div className="flex h-10 justify-center my-4">
                     <button className="border-2 w-22 h-full rounded-lg">

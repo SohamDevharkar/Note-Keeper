@@ -1,5 +1,8 @@
 import Masonry from 'react-masonry-css'
 import { Card } from './Card'
+import { useQueryClient } from '@tanstack/react-query';
+import { useNoteUpdateMutation } from '../../hooks/useNoteUpdateMutation';
+import { useNoteDeleteMutation } from '../../hooks/useNoteDeleteMutation';
 
 export const NoteLayout = ({
     filteredNotes,
@@ -9,51 +12,49 @@ export const NoteLayout = ({
     setSelectedNote,
     view,
 }) => {
+    const queryClient = useQueryClient();
+    const userName = sessionStorage.getItem('username')
 
-
+    const updateNoteMutation = useNoteUpdateMutation(userName, setNotes, queryClient);
+    const deleteNoteMutation = useNoteDeleteMutation(userName, setNotes, queryClient);
 
     const openModal = (note) => {
         setSelectedNote(note);
     }
 
-    // Commenting for upgrading the function
-    // function handleNoteViewChange(noteId, targetView) {
-    //     const updatedNotes = notes.map((note) => {
-    //         if (noteId === note.id) {
-    //             console.log("current note view: " + note.view);
-    //             console.log("target view: " + targetView)
-    //             const newView = note.view === targetView ? 'notes' : targetView;
-    //             return { ...note, view: newView };
-    //         }
-    //         return note;
-    //     });
-    //     console.log("Before updating noteList: " + JSON.stringify(notes));
-    //     setNotes(updatedNotes);
-    //     sessionStorage.setItem('noteList', JSON.stringify(updatedNotes));
-    //     console.log("updated note list: " + JSON.stringify(updatedNotes));
-    // }
-
     function handleNoteViewChange(noteId, targetView) {
-        const updatedNotes = notes.map((note) => {
+
+        let updatedNote;
+        notes.map((note) => {
             if (noteId === note.id) {
-                if ((note.view === 'archive' && targetView === 'unarchive' && note.prevView) ||
+                console.log("Before - confirming the current view: ", note.view);
+                console.log("Before - confirming the curent preView request: ", note.prevView);
+                if ((note.view === 'archive' && targetView === 'notes' && note.prevView) ||
                     (note.view === 'trash' && targetView === 'restore' && note.prevView)) {
-                    return { ...note, view: note.prevView, prevView: undefined };
+                    updatedNote = { ...note, view: note.prevView, prevView: undefined };
+                    console.log("After - confirming the current view: ", updatedNote.view);
+                    console.log("After - confirming the curent preView request: ", updatedNote.prevView);
+                } else {
+                    updatedNote = { ...note, prevView: note.view, view: targetView };
+                    console.log("After - confirming the current view: ", updatedNote.view);
+                    console.log("After - confirming the curent preView request: ", updatedNote.prevView);
                 }
-                return { ...note, prevView: note.view, view: targetView };
             }
             return note;
         });
-        setNotes(updatedNotes);
-        sessionStorage.setItem('noteList', JSON.stringify(updatedNotes));
+        updateNoteMutation.mutate(updatedNote);
     }
 
     function handleDeleteNote(noteId) {
         const deletedNote = notes.find((note) => noteId === note.id)
-        const updatedNotes = notes.filter((note) => note.id !== noteId)
-        setNotes(updatedNotes);
-        sessionStorage.setItem('noteList', JSON.stringify(updatedNotes));
-        console.log("deleted note " + JSON.stringify(deletedNote))
+        deleteNoteMutation.mutate(noteId, {
+            onSuccess: ()=> console.log("Deleted Note: ", deletedNote),
+            onError: (error) => console.error("Error deleting note ", error)
+        });
+               
+        
+        
+        console.log("deleted note: " ,deletedNote)
     }
 
     const breakpointColumnsObj = {
@@ -65,81 +66,10 @@ export const NoteLayout = ({
         640: 1,
     }
 
-    // return <div className={`grid grid-cols-1 sm:grid-cols-2 
-    // md:grid-cols-3 lg:grid-cols-4 ${sidebaropen?'xl:grid-cols-5':
-    // 'xl:grid-cols-6'} gap-1 xl:gap-4 sm:p-2 xl:p-4  transition-all duration-300`}>
-    //     {filteredNotes.reverse().map((note) => {
-    //         console.log('from app.jsx note: ' + note);
-    //         return (<div key={note.id} className=''>
-    //                     <Card id={note.id} title={note.title} 
-    //                         content={note.content} 
-    //                         bgColor="bg-red-200" 
-    //                         setViewFilter={setViewFilter}
-    //                     />
-    //                 </div>)
-    //             }
-    //         )
-    //     }
-    // </div>
-
     const { pinnedNotes, otherNotes } = filteredNotes.reduce((acc, note) => (acc[note.pinned ? 'pinnedNotes' : 'otherNotes'].push(note), acc), { pinnedNotes: [], otherNotes: [] })
 
     return (
-        // <div className={`w-full  min-h-[200px] `}>
-        //     { view === true ?
-        //             (
-        //                 <div className='  flex flex-col justify-center items-center '>
-        //                     <div className='px-4 mx-6 w-full max-w-[700px]'>
-        //                         {
-        //                             filteredNotes.reverse().map((note) => {
-        //                                 return (
-        //                                     <div key={note.id} >
-        //                                         <Card id={note.id} title={note.title}
-        //                                             content={note.content}
-        //                                             bgColor={note.color}
-        //                                             onViewChange={handleNoteViewChange}
-        //                                             onCardClick={() => openModal(note)}
-        //                                             viewType={note.view}
-        //                                             onDelete={handleDeleteNote}
-        //                                             notes={notes}
-        //                                             setNotes={setNotes}
-        //                                             view={view}
-        //                                             pinned={note.pinned}
-        //                                         />
-        //                                     </div>
-        //                                 )
-        //                             })
-        //                         }
-
-        //                     </div>
-        //                 </div>
-        //             ) : 
-        //             (
-        //                 <Masonry breakpointCols={breakpointColumnsObj}
-        //                     className="my-masonry-grid "
-        //                     columnClassName="my-masonry-grid_column ">
-        //                     {
-        //                         filteredNotes.reverse().map((note) => {
-        //                             return (<div key={note.id} >
-        //                                 <Card id={note.id} title={note.title}
-        //                                     content={note.content}
-        //                                     bgColor={note.color}
-        //                                     onViewChange={handleNoteViewChange}
-        //                                     onCardClick={() => openModal(note)}
-        //                                     viewType={note.view}
-        //                                     onDelete={handleDeleteNote}
-        //                                     notes={notes}
-        //                                     pinned={note.pinned}
-        //                                 />
-        //                             </div>)
-        //                         })
-        //                     }
-        //                 </Masonry>
-        //             )
-        //     }
-        // </div>
-
-        <div className={`w-full  min-h-[200px] `}>
+        <div className={`w-full  min-h-[200px] dark:bg-gray-900 `}>
             {view === true ?
                 (
                     <div className='  flex flex-col justify-center items-center '>
@@ -147,7 +77,7 @@ export const NoteLayout = ({
                             {
                                 pinnedNotes.length > 0 && (
                                     <div>
-                                        <div className='font-sans text-lg text-slate-400 mb-4'>
+                                        <div className='font-sans text-lg text-slate-400 dark:text-gray-200 mb-4'>
                                             Pinned:
                                         </div>
                                         {
@@ -156,7 +86,7 @@ export const NoteLayout = ({
                                                     <div key={note.id} >
                                                         <Card id={note.id} title={note.title}
                                                             content={note.content}
-                                                            bgColor={note.color}
+                                                            bgColor={note.bgColor}
                                                             onViewChange={handleNoteViewChange}
                                                             onCardClick={() => openModal(note)}
                                                             viewType={note.view}
@@ -177,7 +107,7 @@ export const NoteLayout = ({
                             {
                                 otherNotes.length > 0 && (
                                     <div>
-                                        <div className='font-sans text-lg text-slate-400 mb-4'>
+                                        <div className='font-sans text-lg text-slate-400 dark:text-gray-200 mb-4'>
                                             Other:
                                         </div>
                                         {
@@ -186,7 +116,7 @@ export const NoteLayout = ({
                                                     <div key={note.id} >
                                                         <Card id={note.id} title={note.title}
                                                             content={note.content}
-                                                            bgColor={note.color}
+                                                            bgColor={note.bgColor}
                                                             onViewChange={handleNoteViewChange}
                                                             onCardClick={() => openModal(note)}
                                                             viewType={note.view}
@@ -203,7 +133,6 @@ export const NoteLayout = ({
                                     </div>
                                 )
                             }
-
                         </div>
                     </div>
                 ) :
@@ -212,7 +141,7 @@ export const NoteLayout = ({
                         {
                             pinnedNotes.length > 0 && (
                                 <div>
-                                    <div className='font-sans text-lg text-slate-400 px-6 mb-4'>
+                                    <div className='font-sans text-lg text-slate-400 dark:text-gray-200 px-6 mb-4'>
                                         Pinned:
                                     </div>
                                     <Masonry breakpointCols={breakpointColumnsObj}
@@ -224,7 +153,7 @@ export const NoteLayout = ({
                                                     <div key={note.id} >
                                                         <Card id={note.id} title={note.title}
                                                             content={note.content}
-                                                            bgColor={note.color}
+                                                            bgColor={note.bgColor}
                                                             onViewChange={handleNoteViewChange}
                                                             onCardClick={() => openModal(note)}
                                                             viewType={note.view}
@@ -246,7 +175,7 @@ export const NoteLayout = ({
                         {
                             otherNotes.length > 0 && (
                                 <div>
-                                    <div className='font-sans text-lg text-slate-400 px-6 mb-4'>
+                                    <div className='font-sans text-lg text-slate-400 dark:text-gray-200 px-6 mb-4'>
                                         Other:
                                     </div>
                                     <Masonry breakpointCols={breakpointColumnsObj}
@@ -258,7 +187,7 @@ export const NoteLayout = ({
                                                     <div key={note.id} >
                                                         <Card id={note.id} title={note.title}
                                                             content={note.content}
-                                                            bgColor={note.color}
+                                                            bgColor={note.bgColor}
                                                             onViewChange={handleNoteViewChange}
                                                             onCardClick={() => openModal(note)}
                                                             viewType={note.view}
@@ -276,7 +205,6 @@ export const NoteLayout = ({
                                 </div>
                             )
                         }
-
                     </>
                 )
             }

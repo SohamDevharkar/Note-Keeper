@@ -18,6 +18,7 @@ export function SignUpForm() {
     const { mutate, isLoading, isError, error, isSuccess } = useMutation({
         mutationFn: newUserAPI,
         onSucces: () => {
+            navigate('/signin');
             queryClient.invalidateQueries(['users']);
 
         },
@@ -32,12 +33,12 @@ export function SignUpForm() {
         mutate(data);
         // alert("User signed up!");
         reset();
-        navigate('/signin');
+        
     }
 
     return (
         <div className="fixed inset-0 flex flex-col justify-center items-center
-            bg-slate-300">
+             bg-gradient-to-br from-yellow-100 to-orange-200 dark:from-gray-800 dark:to-gray-700">
             <form onSubmit={handleSubmit(handleOnSubmit)}
                 className={`bg-white ${errors ? 'h-120' : 'h-110'} w-100 rounded-xl py-2`}>
                 <header className="flex justify-center text-lg my-2 font-bold p-2">
