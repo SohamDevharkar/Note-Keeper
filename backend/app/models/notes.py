@@ -9,8 +9,8 @@ def generate_uuid_string():
     return str(uuid.uuid4())
 
 class SyncStatus(enum.Enum):
-    synced = "synced",
-    pending = "pending",
+    synced = "synced"
+    pending = "pending"
     deleted = "deleted"
 
 class Notes(db.Model) :
@@ -23,8 +23,8 @@ class Notes(db.Model) :
     bgColor = db.Column(db.String(40))
     pinned = db.Column(db.Boolean, nullable=False)
     user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = db.Column(db.DateTime, default = lambda: datetime.now(timezone.utc), onupdate= lambda: datetime.now(timezone.utc))
+    created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime(timezone=True), default = lambda: datetime.now(timezone.utc), onupdate= lambda: datetime.now(timezone.utc))
     sync_status = db.Column(SqlEnum(SyncStatus), default = SyncStatus.synced, nullable=False)
     user = db.relationship('Users', back_populates='notes')
     

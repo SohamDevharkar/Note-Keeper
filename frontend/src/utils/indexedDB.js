@@ -2,8 +2,8 @@ import Dexie from 'dexie'
 
 const db = new Dexie('NotesDatabase');
 
-db.version(1).stores({
-    notes: 'id, title, content, view, prevView, bgColor, pinned, user_id'
+db.version(2).stores({
+    notes: 'id, title, content, view, prevView, bgColor, pinned, user_id, created_at, updated_at, sync_status'
 })
 
 db.open().catch((err) => {

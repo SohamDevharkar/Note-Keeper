@@ -2,7 +2,6 @@ import { RiInboxArchiveLine } from "react-icons/ri";
 import { NoteLayout } from "../components/my-components/NoteLayout"
 import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { db } from '../utils/indexedDB'
 import { useFetchAndLoad } from "../hooks/useFetchAndLoad";
 
 export const ArchiveView = ({
@@ -35,7 +34,7 @@ export const ArchiveView = ({
     if(isLoading) return <div>Loading archived notes...</div>
     if(isError) return <div>Error Loading archived notes...</div>
 
-    return <div className={`${isArrayNullOrEmpty(notes) ? 'fixed' : ''} border-4  p-2 border-purple-600  sm:w-full`}>
+    return <div className={`${isArrayNullOrEmpty(notes) ? 'fixed' : ''}  h-full sm:w-full`}>
         {
             isArrayNullOrEmpty(notes) ? (
                 <div className="sticky flex flex-col items-center h-60 my-[12%] mx-[16%] justify-center text-slate-300">

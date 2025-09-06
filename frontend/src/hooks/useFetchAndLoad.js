@@ -17,7 +17,8 @@ export const useFetchAndLoad = (queryClient, userName) => {
 
     useEffect(() => {
         async function loadIndexedDB() {
-            const cachedNotes = await db.notes.toArray();
+            const cachedNotes = await db.notes.where('sync_status')
+                    .notEqual('deleted').toArray();
             queryClient.setQueryData(['notes', userName], [...cachedNotes]);
         }
         loadIndexedDB();
@@ -35,8 +36,9 @@ export const useFetchAndLoad = (queryClient, userName) => {
         if (data && data.length > 0) {
             console.log("Fresh notes from api: ", data);
             async function cacheNotes() {
+                const activeNotes = data.filter(note => note.sync_status !== 'deleted')
                 await db.notes.clear();
-                await db.notes.bulkPut(data);
+                await db.notes.bulkPut(activeNotes);
             }
             // queryClient.setQueryData(['notes', userName], data)
             cacheNotes();

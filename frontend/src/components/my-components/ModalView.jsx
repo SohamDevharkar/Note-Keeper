@@ -2,14 +2,13 @@ import { useEffect, useState } from "react";
 import { TipTapEditor } from "./Tiptap";
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { BsPin, BsPinFill, BsTrash } from "react-icons/bs";
-import { RiInboxArchiveLine } from "react-icons/ri";
+import { RiInboxArchiveLine, RiInboxUnarchiveLine } from "react-icons/ri";
 import { MdFormatColorText } from "react-icons/md";
-import { Palette } from "lucide-react";
 import { Pallete } from "./Pallete";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNoteUpdateMutation } from "../../hooks/useNoteUpdateMutation";
 
-export const ModalView = ({ selectedNote, setSelectedNote, notes, setNotes, }) => {
+export const ModalView = ({ selectedNote, setSelectedNote, notes, setNotes,}) => {
     const [title, setTitle] = useState(selectedNote.title)
     const [content, setContent] = useState(selectedNote.content);
     const [showTipTapMenu, setShowTipTapMenu] = useState(false);
@@ -17,52 +16,59 @@ export const ModalView = ({ selectedNote, setSelectedNote, notes, setNotes, }) =
     const [bgColor, setBgColor] = useState(selectedNote.bgColor || 'bg-white');
     const [pinned, setPinned] = useState(selectedNote.pinned);
 
-    const items = [
-        {
-            title: "Archive",
-            icon: RiInboxArchiveLine,
-            view: 'archive',
+    const viewType = selectedNote.view;
 
-        },
-        {
-            title: "Trash",
-            icon: BsTrash,
-            view: 'trash',
+    let items = []
 
-        },
-        {
-            title: "theme",
-            icon: IoColorPaletteOutline
-        },
-        {
+    if (viewType === 'archive') {
+        items = [
+            {
+                title: "Unarchive",
+                icon: RiInboxUnarchiveLine,
+                view: 'notes'
+            },
+            {
+
+                title: "Trash",
+                icon: BsTrash,
+                view: 'trash',
+            },
+            {
+                title: "theme",
+                icon: IoColorPaletteOutline
+            },
+            {
+                title: "Format",
+                icon: MdFormatColorText
+            },
+
+        ];
+    } else {
+        items = [
+            {
+                title: "Archive",
+                icon: RiInboxArchiveLine,
+                view: 'archive',
+            },
+            {
+                title: "Trash",
+                icon: BsTrash,
+                view: 'trash',
+            },
+            {
+                title: "theme",
+                icon: IoColorPaletteOutline
+            },
+            {
             title: "Format",
             icon: MdFormatColorText
-        },
-
-    ]
+            },
+        ]
+    }
 
     const closeModal = () => {
         setSelectedNote(null);
     }
-
-    // function handleSubmit(updatedNote) {
-    //     // const notes = sessionStorage.getItem('noteList');
-    //     const updatedNoteWithBgColor = {...updatedNote, color: color}
-    //     const updatedNoteList = notes.map((note) => {
-    //         console.log("updated note id: " + updatedNote.id)
-
-    //         if (note.id === updatedNoteWithBgColor.id) {
-    //             console.log("updatedNote: ", { title: updatedNote.title, content: updatedNote.content })
-
-    //             return updatedNoteWithBgColor;
-    //         }
-    //         return note;
-    //     });
-    //     setNotes(updatedNoteList);
-    //     setSelectedNote(updatedNoteWithBgColor);
-    //     sessionStorage.setItem('noteList', JSON.stringify(notes));
-    //     closeModal();
-    // }
 
     const queryClient = useQueryClient();
     const userName = sessionStorage.getItem('username')
@@ -76,20 +82,13 @@ export const ModalView = ({ selectedNote, setSelectedNote, notes, setNotes, }) =
 
 
     function handleSubmit(updatedNote) {
-        // const updatedNoteWithBgColor = { ...updatedNote, color: color, pinned: pinned };
-        // const updatedNoteList = notes.map((note) => {
-        //     if (note.id === updatedNoteWithBgColor.id) {
-        //         return updatedNoteWithBgColor;
-        //     }
-        //     return note;
-        // });
-        // setNotes(updatedNoteList);
-        // setSelectedNote(updatedNoteWithBgColor);
-        // sessionStorage.setItem('noteList', JSON.stringify(updatedNoteList));
-        // closeModal();
+        const updatedNoteWithBgColor = { ...updatedNote, 
+            bgColor: bgColor, 
+            pinned: pinned, 
+            updated_at: new Date().toISOString(), 
+            sync_status: 'updated' 
+        };
 
-        const updatedNoteWithBgColor = { ...updatedNote, bgColor: bgColor, pinned: pinned };
-        
         //for testing:
         console.log("Submitting updated note:", updatedNoteWithBgColor);
 
@@ -102,20 +101,19 @@ export const ModalView = ({ selectedNote, setSelectedNote, notes, setNotes, }) =
 
     }
 
-    //repeated code from card.jsx except last line
     function handleNoteViewChange(noteId, targetView) {
-        const updatedNotes = notes.map((note) => {
-            if (noteId === note.id) {
-                const newView = note.view === targetView ? 'notes' : targetView;
-                return { ...note, view: newView };
-            }
-            return note;
-        });
-        console.log("Before updating noteList: " + JSON.stringify(notes));
-        setNotes(updatedNotes);
-        sessionStorage.setItem('noteList', JSON.stringify(updatedNotes));
-        console.log("updated note list: " + JSON.stringify(updatedNotes));
-        closeModal();
+        let currentNote = notes.find(note => note.id === noteId);
+        const updatedNote = {
+            ...currentNote,
+            updated_at: new Date().toISOString(),
+            prevView: currentNote.view, 
+            view: targetView, 
+            sync_status: 'updated'
+        }
+        
+        updateNoteMutation.mutate(updatedNote, {
+            onSuccess: () => closeModal()
+        })
     }
 
     return (
@@ -124,6 +122,7 @@ export const ModalView = ({ selectedNote, setSelectedNote, notes, setNotes, }) =
             <div className="bg-black opacity-40 absolute inset-0" />
             <div className={`relative transition-all duration-300 ${bgColor ? bgColor : 'dark:bg-gray-700'} border-2 border-gray-500 
                 min-h-[600px] w-150 rounded-md `}>
+
                 <div className={`max-w-full h-full  border-4 my-2 border-transparent rounded-md`}>
                     <div className="flex items-center">
                         <input placeholder="Title" value={title} className="focus:border-b pb-2 outline-none 
@@ -139,8 +138,9 @@ export const ModalView = ({ selectedNote, setSelectedNote, notes, setNotes, }) =
                         value={content}
                         onChange={setContent}
                         showTipTapMenu={showTipTapMenu}
-                        className={`w-full min-h-[480px] resize-none focus:outline-none border-none ${bgColor ? 'dark:text-black' : 'dark:text-gray-200' } `}
+                        className={`w-full min-h-[480px] resize-none focus:outline-none border-none ${bgColor ? 'dark:text-black' : 'dark:text-gray-200'} `}
                     />
+
                     <div className="flex justify-between">
                         <div className="flex gap-6 mx-4 my-2">
                             {
@@ -163,7 +163,6 @@ export const ModalView = ({ selectedNote, setSelectedNote, notes, setNotes, }) =
                                                     setShowPalette={setShowPalette}
                                                     bgColor={bgColor}           // pass current local color
                                                     setBgColor={setBgColor}
-
                                                 />
                                             }
                                         </div>
@@ -172,8 +171,7 @@ export const ModalView = ({ selectedNote, setSelectedNote, notes, setNotes, }) =
                                             title={item.title}
                                             className={`text-gray-600 hover:text-black hover:bg-slate-100 
                                                         h-8 w-8 rounded-full flex justify-center items-center  `}
-                                            onClick={() => {
-                                                console.log(item.view)
+                                            onClick={() => {                                                
                                                 item.title === "Format" ? setShowTipTapMenu(!showTipTapMenu) : handleNoteViewChange(selectedNote.id, item.view);
                                             }}>
                                             <item.icon size={20} />

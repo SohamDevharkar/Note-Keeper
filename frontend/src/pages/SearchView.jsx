@@ -29,7 +29,7 @@ export const SearchView = ({ notes, sidebaropen, setNotes, searchQuery, setSelec
         <div>
             {
                 !searchQuery ? (
-                    <div className="flex flex-col justify-center items-center border-4 h-168 text-slate-500">
+                    <div className="flex flex-col justify-center items-center h-168 text-slate-500">
                         <LuSearch size={100} />
                         <span>Search will appear here</span>
                     </div>

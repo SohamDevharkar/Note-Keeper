@@ -18,32 +18,11 @@ export const Pallete = ({ id, setShowPalette, setBgColor, notes, setNotes }) => 
     const updateNoteMutation = useNoteUpdateMutation(userName, setNotes, queryClient);
 
     const onColorChange = (targetColor) => {
-        // if (setBgColor) {
-        //     //updating  bg-color locally for modal
-        //     setBgColor(targetColor);
-        //     setShowPalette(false)
-            
-        // } else {
-        //     // updating globally for note cards.
-        //     console.log("Checking notes state variable", + notes);
-        //     const updatedNotes = notes.map((note) => {
-        //         if (id === note.id) {
-        //             const updatedNoteWithBgColor = { ...note, bgColor: targetColor }
-        //             updateNoteMutation.mutate(updatedNoteWithBgColor);
-        //             // return { ...note, bgColor: targetColor }
-        //             return updatedNoteWithBgColor
-        //         }
-        //         return note;
-        //     })
-        //     setNotes(updatedNotes);            
-        // }
-        // setShowPalette(false);
-
         if(id && notes && setNotes) {
-            console.log("Checking notes state variable", + notes);
+            console.log("Checking notes state variable", notes);
             const updatedNotes = notes.map((note) => {
                 if (id === note.id) {
-                    const updatedNoteWithBgColor = { ...note, bgColor: targetColor }
+                    const updatedNoteWithBgColor = { ...note, bgColor: targetColor, updated_at: new Date().toISOString(), sync_status: 'updated' }
                     updateNoteMutation.mutate(updatedNoteWithBgColor);
                     // return { ...note, bgColor: targetColor }
                     return updatedNoteWithBgColor
@@ -76,16 +55,11 @@ export const Pallete = ({ id, setShowPalette, setBgColor, notes, setNotes }) => 
                             e.stopPropagation();
                             setShowPalette(false)
                             onColorChange(color);
-                            
-                            // console.log("modal expected color: " + color);
-                            // update local modal color only'
-
                             setShowPalette(false);
                         }}
                     />
                 ))
             }
-
         </div>
     )
 }

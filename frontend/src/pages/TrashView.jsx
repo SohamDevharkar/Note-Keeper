@@ -21,7 +21,7 @@ export const TrashView = ({
         }
     }, [data, setNotes])
 
-    const filteredTrashNotes = notes.filter((note) => note.view === 'trash');
+    const filteredTrashNotes = notes.filter((note) => note.view === 'trash' && note.sync_status !== "SyncStatus.deleted");
 
     function isArrayNullOrEmpty(filteredTrashNotes) {
         return notes === null || notes === undefined || (Array.isArray(notes) && notes.length === 0);
@@ -32,7 +32,7 @@ export const TrashView = ({
     if (isLoading) return <div>Loading notes....</div>
     if (isError) return <div>Error Loading notes</div>
 
-    return <div className={`${isArrayNullOrEmpty(filteredTrashNotes) ? 'fixed' : 'relative'} border-4  p-2 border-purple-600 sm:w-full`}>
+    return <div className={`${isArrayNullOrEmpty(filteredTrashNotes) ? 'fixed' : 'relative'} h-full p-2 sm:w-full dark:bg-gray-900`}>
         {
             isArrayNullOrEmpty(filteredTrashNotes) ? (
                 <div className=" flex flex-col items-center h-60 my-[12%] mx-[16%] justify-center text-slate-300">

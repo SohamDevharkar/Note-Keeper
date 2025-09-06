@@ -4,6 +4,8 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@plugin "tailwind-scrollbar";
+
 body {
   font-family: 'Open Sans', sans-serif;
   /* font-weight: 400; */

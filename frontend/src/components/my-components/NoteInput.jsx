@@ -11,13 +11,19 @@ import { Pallete } from "./Pallete";
 const createNoteApi = async (noteData) => {
     console.log('hitting backend create note')
     const token = sessionStorage.getItem('token'); console.log('current token: ' + token);
+    if (!token) {
+        throw new Error("Token not found in session storage");
+        
+    }
     try {
-        const response = await axios.post('http://127.0.0.1:5000/api/v1/notes/newNote', noteData, {
+        const response = await axios.post('http://127.0.0.1:5000/api/v1/notes/sync', 
+            {notes: [noteData] }, 
+            {
             headers: {
                 Authorization: `Bearer ${token}`
             }
         });
-        console.log("newNote.data response: " + JSON.stringify(response.data))
+        console.log("newNote.data response: ", response.data)
         return response.data;
 
     } catch (error) {
@@ -36,8 +42,7 @@ const createNoteApi = async (noteData) => {
 
 }
 
-
-export const NoteInput = ({ setNotes, inputOpen, setInputOpen }) => {
+export const NoteInput = ({inputOpen, setInputOpen }) => {
 
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
@@ -64,7 +69,7 @@ export const NoteInput = ({ setNotes, inputOpen, setInputOpen }) => {
             queryClient.setQueryData(["notes", userName], data);
         },
 
-        onError: (err, newNote, context) => {
+        onError: (context) => {
             if (context?.previousNotes) {
                 queryClient.setQueryData(["notes", userName], context.previousNotes);
             }
@@ -89,11 +94,9 @@ export const NoteInput = ({ setNotes, inputOpen, setInputOpen }) => {
             }
         }
 
-        if (open) {
+        if (inputOpen) {
             document.addEventListener('mousedown', handleClickOutside);
-        } else {
-            document.removeEventListener('mousedown', handleClickOutside);
-        }
+        } 
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [inputOpen, title, content,])
 
@@ -120,11 +123,13 @@ export const NoteInput = ({ setNotes, inputOpen, setInputOpen }) => {
             view: targetView,
             prevView: targetView === 'archive' ? 'notes' : undefined,
             bgColor: bgColor || 'bg-white',
-            pinned: false
+            pinned: false,
+            updated_at: new Date().toISOString(),
+            created_at: new Date().toISOString(),
+            sync_status: 'pending'
         }
         mutation.mutate(newNote);
         console.log("Mutation succeeded: ", JSON.stringify(newNote));
-
     }
 
     function handleArchiveViewChange(targetView = 'notes') {
@@ -154,9 +159,10 @@ export const NoteInput = ({ setNotes, inputOpen, setInputOpen }) => {
                 </div>
             ) : (
                 //expanded state
-                <div className={`shadow-xl rounded-xl px-4 py-4 transition-all duration-300 z-100 min-h-[150px] ${bgColor} dark:bg-gray-700`}>
+                <div className={`shadow-xl rounded-xl px-4 py-4 transition-all duration-300 z-100 min-h-[150px] ${bgColor === 'bg-white' ? 'dark:bg-gray-700' : bgColor}`}>
                     <input ref={titleRef} placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)}
-                        className="w-full text-lg font-medium focus:outline-none mb-4 border-b dark:text-gray-200 dark:placeholder:text-gray-200" />
+                        className={`w-full text-lg font-medium focus:outline-none mb-4 border-b 
+                        dark:text-gray-200   ${bgColor !== 'bg-white' ? 'dark:placeholder:text-black': 'dark:placeholder:text-gray-200'}`} />
                     
                     <div className={`${inputOpen ? 'pt-1 w-full' : 'hidden'} `}>
                         <TipTapEditor
@@ -167,12 +173,12 @@ export const NoteInput = ({ setNotes, inputOpen, setInputOpen }) => {
                             className={`w-full min-h-[100px] resize-none focus:outline-none dark:text-gray-200`}
                         />
                         <div className="flex justify-between items-center mt-2">
-                            <div className="flex gap-4 text-gray-600 dark:text-gray-200">
-                                <button title="Formatting" className="hover:text-black dark:hover:text-gray-200 dark:hover:bg-slate-600 p-2 rounded-full" onClick={
+                            <div className={`flex gap-4 text-gray-600 dark:text-gray-200 ${bgColor !== 'bg-white' ? 'text-black': ''}`}>
+                                <button title="Formatting" className={`hover:text-black dark:hover:text-gray-200 dark:hover:bg-slate-600 p-2 rounded-full ${bgColor !== 'bg-white' ? 'text-black': ''}`} onClick={
                                     () => setShowTipTapMenu(!showTipTapMenu)}>
                                     <MdFormatColorText size={22}/>
                                 </button>
-                                <button title="Archive" className="hover:text-black dark:hover:text-gray-200 dark:hover:bg-slate-600 p-2 rounded-full" onClick={
+                                <button title="Archive" className={`hover:text-black dark:hover:text-gray-200 dark:hover:bg-slate-600 p-2 rounded-full ${bgColor !== 'bg-white' ? 'text-black': ''}`} onClick={
                                     (e) => {
                                         e.preventDefault();
                                         handleArchiveViewChange('archive');
@@ -180,7 +186,7 @@ export const NoteInput = ({ setNotes, inputOpen, setInputOpen }) => {
                                 }>
                                     <RiInboxArchiveLine size={22} />
                                 </button>
-                                <button title="Background" className="hover:text-black dark:hover:text-gray-200 dark:hover:bg-slate-600 p-2 rounded-full" onClick={
+                                <button title="Background" className={`hover:text-black dark:hover:text-gray-200 dark:hover:bg-slate-600 p-2 rounded-full ${bgColor !== 'bg-white' ? 'text-black': ''}`} onClick={
                                     (e) => {
                                         e.preventDefault();
                                         setShowPalette(s => !s)

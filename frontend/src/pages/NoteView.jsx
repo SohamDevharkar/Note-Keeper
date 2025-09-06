@@ -33,7 +33,7 @@ export const NoteView = ({ sidebaropen,
     <div className={`min-h-[100px] dark:bg-gray-900 transition-all w-full duration-300`}>
       <NoteInput notes={notes} setNotes={setNotes} inputOpen={inputOpen} setInputOpen={setInputOpen} />
     </div>
-    <div className={`pt-8 ${sidebaropen ? 'w-full' : 'max-w-screen'} dark:bg-gray-900  sm:w-full `}>
+    <div className={`pt-8 min-h-[582px] flex flex-col ${sidebaropen ? 'w-full' : 'max-w-screen'} dark:bg-gray-900`}>
       <NoteLayout filteredNotes={filteredNotes} setNotes={setNotes}
         sidebaropen={sidebaropen}
         notes={notes}

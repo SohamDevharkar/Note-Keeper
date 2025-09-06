@@ -93,7 +93,7 @@ export const Card = ({
     function handlePinToggle(e) {
         e.stopPropagation();
         const selectedNote = notes.find(note => note.id === id);
-        updateNoteMutation.mutate({ ...selectedNote, pinned: !selectedNote.pinned });
+        updateNoteMutation.mutate({ ...selectedNote, pinned: !selectedNote.pinned, updated_at: new Date().toISOString(), sync_status: 'updated' });
     }
 
     function handleSafeHtml(json) {
@@ -102,16 +102,17 @@ export const Card = ({
     }
 
     return (
-        <div className={`${view ? 'max-w-screen-lg  my-4 min-h-[100px] w-full' : 'sm:max-w-[250px] sm:px-2'} 
-                        w-90 border-3 hover:border-red-500 min-h-[200px] ${bgColor} transition-all duration-300 dark:text-black
-                        rounded-md shadow break-inside-avoid whitespace-pre-wrap flex flex-col justify-between`
+        <div className={`group relative ${view ? 'max-w-screen-lg  my-4 min-h-[100px] w-full' : 'sm:max-w-[250px] sm:px-2'} 
+                        hover:border-black border w-90 hover:border-3 dark:hover:border-red-500 min-h-[200px] 
+                        ${bgColor} transition-all duration-100 dark:text-black rounded-md shadow break-inside-avoid 
+                        whitespace-pre-wrap flex flex-col justify-between`
         }
             onClick={onCardClick}>
             <div className="flex items-center">
                 <p className=" px-2 font-semibold font-sans text-xl w-full ">
                     {title}
                 </p>
-                <span className="p-2 hover:bg-slate-50 rounded-full"
+                <span className="p-2 hover:bg-slate-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                     onClick={handlePinToggle}>
                     {pinned ? <BsPinFill size={18} /> : <BsPin size={18} />}
                 </span>
@@ -119,7 +120,8 @@ export const Card = ({
 
             <p className="flex-10 mx-2" dangerouslySetInnerHTML={{ __html: handleSafeHtml(content) }} />
 
-            <div className=" flex justify-around p-1" onClick={(e) => e.stopPropagation()}>
+            <div className=" flex justify-around p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200" 
+                onClick={(e) => e.stopPropagation()}>
 
                 {items.map((item) => (
                     item.title === 'theme' ? (

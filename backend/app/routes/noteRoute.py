@@ -4,6 +4,7 @@ from ..decorators import token_required
 from ..extensions import db
 from datetime import datetime, timezone
 from sqlalchemy.exc import IntegrityError
+from ..models.notes import SyncStatus
 import logging
 import dateutil.parser
 
@@ -140,19 +141,27 @@ def sync_notes(user_id):
             client_note_updated_at = dateutil.parser.isoparse(updated_at_str) if updated_at_str else datetime.now(timezone.utc)
         except (ValueError, TypeError):
             client_note_updated_at = datetime.now(timezone.utc)
+            
+        if client_note_updated_at.tzinfo is None:
+            client_note_updated_at = client_note_updated_at.replace(tzinfo=timezone.utc)
 
         # Parse created_at
         try:
             created_at = dateutil.parser.isoparse(created_at_str) if created_at_str else datetime.now(timezone.utc)
         except (ValueError, TypeError):
             created_at = datetime.now(timezone.utc)
+            
+        if created_at.tzinfo is None:
+            created_at = created_at.replace(tzinfo=timezone.utc)
 
         # Handle deletion case
-        if client_note.get('synced_status') == "deleted":
+        if client_note.get('sync_status') == "deleted":
             if note_id:
                 existing_note = Notes.query.filter_by(id=note_id, user_id=user_id).first()
                 if existing_note:
-                    db.session.delete(existing_note)
+                    # db.session.delete(existing_note)
+                    existing_note.sync_status = 'deleted'
+                    existing_note.updated_at = datetime.now(timezone.utc)
             continue
 
         # Check for existing note (update)
@@ -183,7 +192,8 @@ def sync_notes(user_id):
                 pinned=client_note.get('pinned', False),
                 bgColor=client_note.get('bgColor', 'bg-white'),
                 created_at=created_at,
-                updated_at=client_note_updated_at
+                updated_at=client_note_updated_at,
+                sync_status = SyncStatus.synced
             )
             db.session.add(new_note)
             # SQLAlchemy will auto-generate ID on commit
