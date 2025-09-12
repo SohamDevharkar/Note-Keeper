@@ -3,36 +3,43 @@ import { db } from "../utils/indexedDB";
 import axios from "axios";
 
 const updateNoteApi = async (updatedNote) => {
-    
     //for testing
     console.log("updateNoteApi received:", updatedNote);
+    const newNoteToSave= {...updatedNote, 
+        updated_at: new Date().toISOString(), 
+        sync_status: 'synced'
+    }
 
     const token = sessionStorage.getItem('token');
-    // const response = await axios.patch(`http://127.0.0.1:5000/api/v1/notes/updateNote/${updatedNote.id}`, 
-    //     updatedNote,
-    //     {
-    //         headers: {
-    //             Authorization: `Bearer ${token}`
-    //         }
-    //     }
-    // )
-
-    const response = await axios.post(`http://127.0.0.1:5000/api/v1/notes/sync`, 
-        {notes: [updatedNote]},
-        {
-            headers: {
-                Authorization: `Bearer ${token}`
+    
+    try {
+        const response = await axios.post(`http://127.0.0.1:5000/api/v1/notes/sync`,
+            { notes: [newNoteToSave] },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             }
-        }
-    )
+        )
+        await db.notes.put(newNoteToSave);
+        console.log("Saved to IndexedDB:", newNoteToSave);
+        return response.data;
 
-    await db.notes.put(updatedNote);
-    console.log("Saved to IndexedDB:", updatedNote);
-
-    return response.data;
+    } catch (error) {
+        console.log("Sync failed. Saving as pending:", error?.message || error);
+        const pendingNote = {...newNoteToSave, sync_status: 'pending'}
+        await db.notes.put(pendingNote);
+        await db.mutation_queue.add({
+            id: crypto.randomUUID(),
+            type: 'update',
+            note: pendingNote,
+            timestamp: Date.now()
+        });
+        return pendingNote;
+    }
 }
 
-export const useNoteUpdateMutation = (userName, setNotes, queryClient) => {
+export const useNoteUpdateMutation = (userName, queryClient) => {
     const mutation = useMutation({
         mutationFn: updateNoteApi,
         onMutate: async (updatedNote) => {
@@ -45,23 +52,17 @@ export const useNoteUpdateMutation = (userName, setNotes, queryClient) => {
             //     old.map(note => note.id === updatedNote.id ? updatedNote : note)
             // );
 
-            // if(setNotes) {
-            //     setNotes(prev => prev.map(note => note.id === updatedNote.id 
-            //         ? updatedNote : note)
-            //     );
-            // }
+         
 
             queryClient.setQueryData(['notes', userName], updatedNotes);
-            if(setNotes) setNotes(updatedNotes);
             return { previousNotes }
         },
 
         onError: (error, updateNote, context) => {
-            if(context?.previousNotes) {
+            if (context?.previousNotes) {
                 queryClient.setQueryData(['notes', userName], context.previousNotes);
-                if(setNotes) setNotes(context.previousNotes)
             }
-            console.error("Failed to update note: " , error);
+            console.error("Failed to update note: ", error);
         },
 
         onSettled: () => {

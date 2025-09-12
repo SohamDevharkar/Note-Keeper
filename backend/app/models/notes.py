@@ -25,6 +25,7 @@ class Notes(db.Model) :
     user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime(timezone=True), default = lambda: datetime.now(timezone.utc), onupdate= lambda: datetime.now(timezone.utc))
+    client_id = db.Column(db.String(36), nullable = False)
     sync_status = db.Column(SqlEnum(SyncStatus), default = SyncStatus.synced, nullable=False)
     user = db.relationship('Users', back_populates='notes')
     
@@ -48,5 +49,7 @@ class Notes(db.Model) :
             'user_id': self.user_id,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
-            'sync_status': str(self.sync_status)
+            'sync_status': self.sync_status.value if self.sync_status else None,
+            'client_id': self.client_id
+            # 'sync_status': self.sync_status.value if hasattr(self.sync_status, 'value') else self.sync_status
         } 

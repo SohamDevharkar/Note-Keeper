@@ -3,46 +3,11 @@ import { TipTapEditor } from "./Tiptap";
 import { MdFormatColorText } from "react-icons/md";
 import { RiInboxArchiveLine } from "react-icons/ri";
 import { IoColorPaletteOutline } from "react-icons/io5";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { db } from '../../utils/indexedDB'
-import axios from 'axios'
+import { useQueryClient } from "@tanstack/react-query";
 import { Pallete } from "./Pallete";
+import { useCreateNoteMutation } from "../../hooks/useCreateNoteMutation";
 
-const createNoteApi = async (noteData) => {
-    console.log('hitting backend create note')
-    const token = sessionStorage.getItem('token'); console.log('current token: ' + token);
-    if (!token) {
-        throw new Error("Token not found in session storage");
-        
-    }
-    try {
-        const response = await axios.post('http://127.0.0.1:5000/api/v1/notes/sync', 
-            {notes: [noteData] }, 
-            {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-        console.log("newNote.data response: ", response.data)
-        return response.data;
-
-    } catch (error) {
-        console.error('Error in createNoteApi:', error);
-        if (error.response) {
-            console.error('Response data:', error.response.data);
-            console.error('Response status:', error.response.status);
-            console.error('Response headers:', error.response.headers);
-        } else if (error.request) {
-            console.error('No response received, request was:', error.request);
-        } else {
-            console.error('Error setting up request:', error.message);
-        }
-        throw error;  // rethrow for react-query onError as well
-    }
-
-}
-
-export const NoteInput = ({inputOpen, setInputOpen }) => {
+export const NoteInput = ({inputOpen, setInputOpen, isOnline }) => {
 
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
@@ -55,31 +20,7 @@ export const NoteInput = ({inputOpen, setInputOpen }) => {
     const titleRef = useRef();
     const userName = sessionStorage.getItem('username');
 
-    const mutation = useMutation({
-        mutationFn: createNoteApi,
-        onMutate: (newNote) => {
-            queryClient.cancelQueries(["notes", userName]);
-            const previousNotes = queryClient.getQueryData(["notes", userName]) || [];
-            queryClient.setQueryData(["notes", userName], [...previousNotes, newNote]);
-
-            db.notes.put(newNote);
-            return { previousNotes };
-        },
-        onSuccess: (data) => {
-            queryClient.setQueryData(["notes", userName], data);
-        },
-
-        onError: (context) => {
-            if (context?.previousNotes) {
-                queryClient.setQueryData(["notes", userName], context.previousNotes);
-            }
-        },
-
-        onSettled: () => {
-            queryClient.invalidateQueries(["notes", userName])
-        }
-    })
-
+    const createNoteMutation = useCreateNoteMutation(userName, queryClient)
 
     useEffect(() => {
         if (inputOpen && titleRef.current) {
@@ -112,24 +53,27 @@ export const NoteInput = ({inputOpen, setInputOpen }) => {
         }
     }
 
-    function addNote(targetView) {
+    function addNote(targetView = 'notes') {
+        const client_id = crypto.randomUUID();
         const newNote = {
-            id: crypto.randomUUID(),
+            id: client_id,
+            client_id: client_id,
             title: title,
             content: content === '' ? {
                 type: 'doc',
                 content: []
             } : content,
+            // view: targetView || 'notes',
+            // prevView: targetView === 'archive' ? 'notes' : undefined,
             view: targetView,
             prevView: targetView === 'archive' ? 'notes' : undefined,
             bgColor: bgColor || 'bg-white',
             pinned: false,
             updated_at: new Date().toISOString(),
             created_at: new Date().toISOString(),
-            sync_status: 'pending'
+            sync_status: isOnline ? 'synced' :  'pending'
         }
-        mutation.mutate(newNote);
-        console.log("Mutation succeeded: ", JSON.stringify(newNote));
+        createNoteMutation.mutate(newNote);
     }
 
     function handleArchiveViewChange(targetView = 'notes') {
@@ -155,7 +99,6 @@ export const NoteInput = ({inputOpen, setInputOpen }) => {
                     <span className="text-gray-500 dark:text-gray-200">
                         Take a note...
                     </span>
-
                 </div>
             ) : (
                 //expanded state

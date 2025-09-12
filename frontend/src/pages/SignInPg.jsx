@@ -76,7 +76,7 @@ export function SignInForm({loginState, setLoginState, isDarkMode, setIsDarkMode
                 {isError && <p className="font-sans text-xs font-light text-red-500 flex justify-center">Incorrect email or password</p>}
 
                 <div className="flex h-10 justify-center my-4">
-                    <button className="border-2 w-22 h-full rounded-lg">
+                    <button className="border-2 w-22 h-full rounded-lg hover:bg-orange-200">
                         Submit
                     </button>
                 </div>

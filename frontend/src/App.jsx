@@ -10,13 +10,14 @@ import { SignInForm } from './pages/SignInPg.jsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { LandingPage } from './pages/LandingPage.jsx';
 import { ProtectedRoutes } from './components/my-components/ProtectedRoutes.jsx';
+import { useBackendStatus } from './hooks/useBackendStatus.js';
 
 const queryClient = new QueryClient();
 
 function App() {
+  const userName = sessionStorage.getItem('username');
   const [loginState, setLoginState] = useState(false);
   const [sidebaropen, setSidebarOpen] = useState(false);
-  const [notes, setNotes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
   const [inputOpen, setInputOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -25,6 +26,8 @@ function App() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return sessionStorage.getItem('theme') === 'dark';
   });
+
+  const isOnline = useBackendStatus();
 
   useEffect(() => {
     const root = document.documentElement;
@@ -36,7 +39,7 @@ function App() {
       sessionStorage.setItem('theme', 'light');
     }
   }, [isDarkMode]);
-
+  
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
@@ -53,8 +56,6 @@ function App() {
           } />
 
           <Route element={<AppLayout
-            notes={notes}
-            setNotes={setNotes}
             sidebaropen={sidebaropen}
             setSidebarOpen={setSidebarOpen}
             searchQuery={searchQuery}
@@ -69,28 +70,29 @@ function App() {
             setLoginState={setLoginState}
             isDarkMode={isDarkMode}
             setIsDarkMode={setIsDarkMode}
+            isOnline={isOnline}
           />}>
             <Route path='/home' element={
               <ProtectedRoutes>
-                <NoteView notes={notes}
-                  setNotes={setNotes}
+                <NoteView 
                   inputOpen={inputOpen}
                   setInputOpen={setInputOpen}
                   sidebaropen={sidebaropen}
                   setSelectedNote={setSelectedNote}
                   view={view}
                   setView={setView}
+                  isOnline={isOnline}
                 />
               </ProtectedRoutes>
             }
             />
             <Route path='/archive' element={
               <ProtectedRoutes>
-                <ArchiveView notes={notes}
+                <ArchiveView
                   sidebaropen={sidebaropen}
-                  setNotes={setNotes}
                   setSelectedNote={setSelectedNote}
                   view={view}
+                  isOnline={isOnline}
                 />
               </ProtectedRoutes>
 
@@ -98,23 +100,23 @@ function App() {
             />
             <Route path='/trash' element={
               <ProtectedRoutes>
-                <TrashView notes={notes}
+                <TrashView
                   inputOpen={inputOpen}
                   setInputOpen={setInputOpen}
                   sidebaropen={sidebaropen}
-                  setNotes={setNotes}
                   view={view}
+                  isOnline={isOnline}
                 />
               </ProtectedRoutes>
             }
             />
             <Route path='/search' element={
               <ProtectedRoutes>
-                <SearchView notes={notes}
+                <SearchView 
                   sidebaropen={sidebaropen}
-                  setNotes={setNotes}
                   searchQuery={searchQuery}
                   setSelectedNote={setSelectedNote}
+                  isOnline={isOnline}
                 />
               </ProtectedRoutes>
             }
@@ -127,14 +129,3 @@ function App() {
 }
 
 export default App
-
-
-{/* <div className={`absolute top-16 left-1/2 transform h-46 bg-red-400 
-          -translate-x-1/2 transition-all duration-300  w-full border-4 border-green-500  
-           px-4 `}> {/*className={`fixed h-56 border top-16 transition-all duration-300 ${sidebaropen ? 'ml-64' : 'ml-16'} w-full py-6`}*/}
-// <NoteInput notes={notes} setNotes={setNotes} />
-{/* </div>
-          <div className={` relative mt-[249px] border-4 border-purple-600 bg-orange-400 w-full px-2 transition-all duration-300 ${sidebaropen ? 'ml-56' : 'ml-16'}`}>
-            <Card title="title" content="sdvoifbaefibjnaeipdfvaksdbiveoankfgpujg[sv0dpvkmwiiwo[;vner0igk;sdnv9ekgdn r0igkvshbrpmvsfjg;sv ergvmkshbsrmvbosbb
-            kbmofjvljenbpkllngposbosbmsjmrsobjmdslv=sd[;lvnwspgkgvmesbjsfkpobekoijs;kvnsopfvkmsfibpfkb=s]fkweogivsfpvne0rrgiojhk" bgColor={'bg-yellow-300'} />
-          </div> */}

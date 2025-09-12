@@ -6,37 +6,30 @@ import { useFetchAndLoad } from "../hooks/useFetchAndLoad"
 
 export const NoteView = ({ sidebaropen,
   inputOpen,
-  notes,
-  setNotes,
   setInputOpen,
   setSelectedNote,
   view,
-
+  isOnline
 }) => {
+  
+  console.count("NoteView rendered");
   const queryClient = useQueryClient()
   const userName = sessionStorage.getItem('username');
-  const {data, isLoading, error, isError} =useFetchAndLoad(queryClient, userName);
+  const {data: noteList = [], isLoading, error, isError} = useFetchAndLoad(queryClient, userName, isOnline);
 
-  useEffect(() => {
-    if(data && data.length > 0) {
-      setNotes(data);
-    }
-  }, [data, setNotes])
-
-  const filteredNotes = notes.filter(note => note && note.view === 'notes') || [];
-  // console.log(`note view for ${userName}: ` + JSON.stringify(filteredNotes));
+  const filteredNotes = noteList.filter(note => note && note.view === 'notes') || [];
+  // console.log(`note view for ${userName}: `,filteredNotes);
 
   if(isLoading) return <div>Loading notes....</div>
-  if(isError) return <div>Error Loading notes</div>
+  if(isError && filteredNotes.length === 0 ) return <div>Error Loading notes</div>
 
   return (<>
     <div className={`min-h-[100px] dark:bg-gray-900 transition-all w-full duration-300`}>
-      <NoteInput notes={notes} setNotes={setNotes} inputOpen={inputOpen} setInputOpen={setInputOpen} />
+      <NoteInput inputOpen={inputOpen} setInputOpen={setInputOpen} isOnline={isOnline} />
     </div>
     <div className={`pt-8 min-h-[582px] flex flex-col ${sidebaropen ? 'w-full' : 'max-w-screen'} dark:bg-gray-900`}>
-      <NoteLayout filteredNotes={filteredNotes} setNotes={setNotes}
+      <NoteLayout filteredNotes={filteredNotes} 
         sidebaropen={sidebaropen}
-        notes={notes}
         setSelectedNote={setSelectedNote}
         view={view}
       />

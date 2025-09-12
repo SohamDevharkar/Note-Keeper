@@ -2,8 +2,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useNoteUpdateMutation } from "../../hooks/useNoteUpdateMutation";
 import { useEffect } from "react";
 
-export const Pallete = ({ id, setShowPalette, setBgColor, notes, setNotes }) => {
-    //{ id, showPalette, setShowPalette, notes, setNotes, setSelectedNote}
+export const Pallete = ({ id, setShowPalette, setBgColor,}) => {
+    
     const Colors = [
         'bg-white',
         'bg-yellow-300',
@@ -15,21 +15,29 @@ export const Pallete = ({ id, setShowPalette, setBgColor, notes, setNotes }) => 
 
     const queryClient = useQueryClient();
     const userName = sessionStorage.getItem('username')
-    const updateNoteMutation = useNoteUpdateMutation(userName, setNotes, queryClient);
+    const updateNoteMutation = useNoteUpdateMutation(userName, queryClient);
 
     const onColorChange = (targetColor) => {
-        if(id && notes && setNotes) {
-            console.log("Checking notes state variable", notes);
-            const updatedNotes = notes.map((note) => {
-                if (id === note.id) {
-                    const updatedNoteWithBgColor = { ...note, bgColor: targetColor, updated_at: new Date().toISOString(), sync_status: 'updated' }
-                    updateNoteMutation.mutate(updatedNoteWithBgColor);
-                    // return { ...note, bgColor: targetColor }
-                    return updatedNoteWithBgColor
-                }
-                return note;
+        if(id) {
+            // console.log("Checking notesList state variable", noteList);
+            // const updatedNotes = notes.map((note) => {
+            //     if (id === note.id) {
+            //         const updatedNoteWithBgColor = { ...note, bgColor: targetColor, updated_at: new Date().toISOString(), sync_status: 'updated' }
+            //         updateNoteMutation.mutate(updatedNoteWithBgColor);
+            //         // return { ...note, bgColor: targetColor }
+            //         return updatedNoteWithBgColor
+            //     }
+            //     return note;
+            // })
+            // setNotes(updatedNotes); 
+            
+            const existingNote = queryClient.getQueryData(['notes', userName])?.find(note => note.id === id);
+            updateNoteMutation.mutate({
+                ...existingNote,
+                bgColor: targetColor, 
+                updated_at: new Date().toISOString(), 
+                sync_status: 'pending'
             })
-            setNotes(updatedNotes); 
         }
 
         if(setBgColor) {

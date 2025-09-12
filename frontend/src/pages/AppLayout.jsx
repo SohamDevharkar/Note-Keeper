@@ -2,10 +2,11 @@ import { Outlet } from "react-router-dom"
 import { Header } from "../components/my-components/Header"
 import { SidebarBox } from "../components/my-components/Sidebar"
 import { ModalView } from "../components/my-components/ModalView"
+import { syncManager } from "../utils/syncManager"
+import { useEffect } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 
 export const AppLayout = ({
-    notes,
-    setNotes,
     sidebaropen,
     setSidebarOpen,
     searchQuery,
@@ -19,8 +20,20 @@ export const AppLayout = ({
     loginState,
     setLoginState,
     isDarkMode,
-    setIsDarkMode
+    setIsDarkMode,
+    isOnline
 }) => {
+    const queryClient = useQueryClient()
+    const userName = sessionStorage.getItem('userName');
+
+    // useEffect(() => {
+    //     if(navigator.onLine) {
+    //         syncManager().then(() => {
+    //             queryClient.invalidateQueries(['notes', userName]);
+    //         })
+    //     }
+    // }, [navigator.onLine]);
+
     return (
         <>
             <div className='flex h-screen overflow-hidden'>
@@ -49,7 +62,6 @@ export const AppLayout = ({
                 {
                     selectedNote &&
                     <ModalView selectedNote={selectedNote}
-                        notes={notes} setNotes={setNotes}
                         setSelectedNote={setSelectedNote}
                         showPalette={showPalette}
                         setShowPalette={setShowPalette}

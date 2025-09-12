@@ -133,8 +133,13 @@ def sync_notes(user_id):
 
     for client_note in client_notes:
         note_id = client_note.get('id')
+        client_id = client_note.get('client_id')
         updated_at_str = client_note.get('updated_at')
         created_at_str = client_note.get('created_at')
+        
+        print(f'client_id:  {client_id}')
+        
+        
 
         # Parse updated_at
         try:
@@ -160,7 +165,7 @@ def sync_notes(user_id):
                 existing_note = Notes.query.filter_by(id=note_id, user_id=user_id).first()
                 if existing_note:
                     # db.session.delete(existing_note)
-                    existing_note.sync_status = 'deleted'
+                    existing_note.sync_status = SyncStatus.deleted.name
                     existing_note.updated_at = datetime.now(timezone.utc)
             continue
 
@@ -180,6 +185,7 @@ def sync_notes(user_id):
                 existing_note.pinned = client_note.get('pinned', False)
                 existing_note.bgColor = client_note.get('bgColor', 'bg-white')
                 existing_note.updated_at = client_note_updated_at
+                existing_note.client_id = client_note.get('client_id')
                 sync_note_ids.add(existing_note.id)
         else:
             # Create new note
@@ -193,7 +199,8 @@ def sync_notes(user_id):
                 bgColor=client_note.get('bgColor', 'bg-white'),
                 created_at=created_at,
                 updated_at=client_note_updated_at,
-                sync_status = SyncStatus.synced
+                sync_status = SyncStatus.synced,
+                client_id = client_note.get('client_id')
             )
             db.session.add(new_note)
             # SQLAlchemy will auto-generate ID on commit

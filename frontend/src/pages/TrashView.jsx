@@ -5,32 +5,31 @@ import { useFetchAndLoad } from "../hooks/useFetchAndLoad";
 import { useEffect } from "react";
 
 export const TrashView = ({
-    notes,
-    setNotes,
     sidebaropen,
     view,
+    isOnline
 }) => {
 
     const queryClient = useQueryClient()
     const userName = sessionStorage.getItem('username');
-    const { data, isLoading, error, isError } = useFetchAndLoad(queryClient, userName);
+    const { data: noteList = [], isLoading, error, isError } = useFetchAndLoad(queryClient, userName, isOnline);
 
-    useEffect(() => {
-        if (data && data.length > 0) {
-            setNotes(data);
-        }
-    }, [data, setNotes])
+    // useEffect(() => {
+    //     if (data && data.length > 0) {
+    //         setNotes(data);
+    //     }
+    // }, [data, setNotes])
 
-    const filteredTrashNotes = notes.filter((note) => note.view === 'trash' && note.sync_status !== "SyncStatus.deleted");
+    const filteredTrashNotes = noteList.filter((note) => note.view === 'trash' && note.sync_status !== "SyncStatus.deleted");
 
     function isArrayNullOrEmpty(filteredTrashNotes) {
-        return notes === null || notes === undefined || (Array.isArray(notes) && notes.length === 0);
+        return filteredTrashNotes === null || filteredTrashNotes === undefined || (Array.isArray(filteredTrashNotes) && filteredTrashNotes.length === 0);
     }
 
     console.log("isArrayNullOrEmpty: " + isArrayNullOrEmpty(filteredTrashNotes));
 
     if (isLoading) return <div>Loading notes....</div>
-    if (isError) return <div>Error Loading notes</div>
+    if (isError && filteredTrashNotes.length) return <div>Error Loading notes</div>
 
     return <div className={`${isArrayNullOrEmpty(filteredTrashNotes) ? 'fixed' : 'relative'} h-full p-2 sm:w-full dark:bg-gray-900`}>
         {
@@ -41,8 +40,6 @@ export const TrashView = ({
                 </div>
             ) : (
                 <NoteLayout filteredNotes={filteredTrashNotes}
-                    notes={notes}
-                    setNotes={setNotes}
                     sidebaropen={sidebaropen}
                     view={view}
                 />

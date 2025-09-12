@@ -5,46 +5,41 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFetchAndLoad } from "../hooks/useFetchAndLoad";
 
 export const ArchiveView = ({
-    notes,
-    setNotes,
     sidebaropen,
     setSelectedNote,
     view,
+    isOnline
 }) => {
 
     const queryClient = useQueryClient()
     const userName = sessionStorage.getItem('username');
-    const {data, isLoading, error, isError} = useFetchAndLoad(queryClient, userName);
+    const {data: noteList = [], isLoading, error, isError} = useFetchAndLoad(queryClient, userName, isOnline);
 
-    useEffect(()=>{
-        if(data && data.length > 0) {
-            setNotes(data);
-        }
-    }, [data, setNotes])
 
-    const filteredArchiveNotes = notes.filter((note) => note.view === 'archive');
+    const filteredArchiveNotes = noteList.filter((note) => note.view === 'archive');
     console.log(`archived view for ${userName}: ` + JSON.stringify(filteredArchiveNotes));
 
     function isArrayNullOrEmpty(filteredArchiveNotes) {
-        return notes === null || notes === undefined || (Array.isArray(notes) && notes.length === 0);
+        return filteredArchiveNotes === null || 
+            filteredArchiveNotes === undefined || 
+            (Array.isArray(filteredArchiveNotes) && 
+            filteredArchiveNotes.length === 0);
     }
 
-    console.log("isArrayNullOrEmpty: " + isArrayNullOrEmpty(notes));
+    console.log("isArrayNullOrEmpty: " + isArrayNullOrEmpty(filteredArchiveNotes));
 
     if(isLoading) return <div>Loading archived notes...</div>
-    if(isError) return <div>Error Loading archived notes...</div>
+    if(isError && filteredArchiveNotes.length) return <div>Error Loading archived notes...</div>
 
-    return <div className={`${isArrayNullOrEmpty(notes) ? 'fixed' : ''}  h-full sm:w-full`}>
+    return <div className={`${isArrayNullOrEmpty(filteredArchiveNotes) ? 'fixed' : ''}  h-full sm:w-full`}>
         {
-            isArrayNullOrEmpty(notes) ? (
+            isArrayNullOrEmpty(filteredArchiveNotes) ? (
                 <div className="sticky flex flex-col items-center h-60 my-[12%] mx-[16%] justify-center text-slate-300">
                     <RiInboxArchiveLine size={200} />
                     <span className="font-sans text-black text-xl">Archived notes appear here.</span>
                 </div>
             ) : (
                 <NoteLayout filteredNotes={filteredArchiveNotes}
-                    notes={notes}
-                    setNotes={setNotes}
                     sidebaropen={sidebaropen}
                     setSelectedNote={setSelectedNote}
                     view={view}

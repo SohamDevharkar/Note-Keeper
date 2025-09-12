@@ -8,7 +8,7 @@ import { Pallete } from "./Pallete";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNoteUpdateMutation } from "../../hooks/useNoteUpdateMutation";
 
-export const ModalView = ({ selectedNote, setSelectedNote, notes, setNotes,}) => {
+export const ModalView = ({ selectedNote, setSelectedNote}) => {
     const [title, setTitle] = useState(selectedNote.title)
     const [content, setContent] = useState(selectedNote.content);
     const [showTipTapMenu, setShowTipTapMenu] = useState(false);
@@ -73,7 +73,7 @@ export const ModalView = ({ selectedNote, setSelectedNote, notes, setNotes,}) =>
     const queryClient = useQueryClient();
     const userName = sessionStorage.getItem('username')
 
-    const updateNoteMutation = useNoteUpdateMutation(userName, setNotes, queryClient);
+    const updateNoteMutation = useNoteUpdateMutation(userName, queryClient);
 
     //for testing
     useEffect(() => {
@@ -81,8 +81,11 @@ export const ModalView = ({ selectedNote, setSelectedNote, notes, setNotes,}) =>
     }, [bgColor]);
 
 
-    function handleSubmit(updatedNote) {
-        const updatedNoteWithBgColor = { ...updatedNote, 
+    function handleSubmit() {
+        const updatedNote = { 
+            ...selectedNote,
+            title: title,
+            content: content, 
             bgColor: bgColor, 
             pinned: pinned, 
             updated_at: new Date().toISOString(), 
@@ -90,25 +93,25 @@ export const ModalView = ({ selectedNote, setSelectedNote, notes, setNotes,}) =>
         };
 
         //for testing:
-        console.log("Submitting updated note:", updatedNoteWithBgColor);
+        console.log("Submitting updated note:", updatedNote);
 
-        updateNoteMutation.mutate(updatedNoteWithBgColor, {
+        updateNoteMutation.mutate(updatedNote, {
             onSuccess: () => {
-                setSelectedNote(updatedNoteWithBgColor)
+                // setSelectedNote(updatedNote)
+                queryClient.invalidateQueries(['notes', userName]);
                 closeModal();
             }
         })
 
     }
 
-    function handleNoteViewChange(noteId, targetView) {
-        let currentNote = notes.find(note => note.id === noteId);
+    function handleNoteViewChange(selectedNote, targetView) {
         const updatedNote = {
-            ...currentNote,
+            ...selectedNote,
             updated_at: new Date().toISOString(),
-            prevView: currentNote.view, 
+            prevView: selectedNote.view, 
             view: targetView, 
-            sync_status: 'updated'
+            sync_status: 'pending'
         }
         
         updateNoteMutation.mutate(updatedNote, {
@@ -172,7 +175,7 @@ export const ModalView = ({ selectedNote, setSelectedNote, notes, setNotes,}) =>
                                             className={`text-gray-600 hover:text-black hover:bg-slate-100 
                                                         h-8 w-8 rounded-full flex justify-center items-center  `}
                                             onClick={() => {                                                
-                                                item.title === "Format" ? setShowTipTapMenu(!showTipTapMenu) : handleNoteViewChange(selectedNote.id, item.view);
+                                                item.title === "Format" ? setShowTipTapMenu(!showTipTapMenu) : handleNoteViewChange(selectedNote, item.view);
                                             }}>
                                             <item.icon size={20} />
                                         </button>

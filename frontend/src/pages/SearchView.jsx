@@ -4,25 +4,25 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useFetchAndLoad } from "../hooks/useFetchAndLoad";
 import { useEffect } from "react";
 
-export const SearchView = ({ notes, sidebaropen, setNotes, searchQuery, setSelectedNote }) => {
+export const SearchView = ({ sidebaropen, searchQuery, setSelectedNote, isOnline }) => {
 
     const queryClient = useQueryClient()
     const userName = sessionStorage.getItem('username');
-    const { data, isLoading, error, isError } = useFetchAndLoad(queryClient, userName);
+    const { data: noteList = [], isLoading, error, isError } = useFetchAndLoad(queryClient, userName, isOnline);
 
-    useEffect(() => {
-        if (data && data.length > 0) {
-            setNotes(data);
-        }
-    }, [data, setNotes])
+    // useEffect(() => {
+    //     if (data && data.length > 0) {
+    //         setNotes(data);
+    //     }
+    // }, [data, setNotes])
 
-    const filteredNotes = notes.filter((note) => note.view === 'notes' && (note.title.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredNotes = noteList.filter((note) => note.view === 'notes' && (note.title.toLowerCase().includes(searchQuery.toLowerCase())
         || JSON.stringify(note.content).toLowerCase().includes(searchQuery.toLowerCase())))
 
-    const filteredArchivedNotes = notes.filter((note) => note.view === 'archive' && (note.title.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredArchivedNotes = noteList.filter((note) => note.view === 'archive' && (note.title.toLowerCase().includes(searchQuery.toLowerCase())
         || JSON.stringify(note.content).toLowerCase().includes(searchQuery.toLowerCase())))
 
-    const filteredTrashedNotes = notes.filter((note) => note.view === 'trash' && (note.title.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredTrashedNotes = noteList.filter((note) => note.view === 'trash' && (note.title.toLowerCase().includes(searchQuery.toLowerCase())
         || JSON.stringify(note.content).toLowerCase().includes(searchQuery.toLowerCase())))
 
     return (
@@ -43,8 +43,6 @@ export const SearchView = ({ notes, sidebaropen, setNotes, searchQuery, setSelec
                                             Notes:
                                         </div>
                                         <NoteLayout filteredNotes={filteredNotes}
-                                            notes={notes}
-                                            setNotes={setNotes}
                                             sidebaropen={sidebaropen}
                                             setSelectedNote={setSelectedNote}
                                         />
@@ -62,8 +60,6 @@ export const SearchView = ({ notes, sidebaropen, setNotes, searchQuery, setSelec
                                             Archives:
                                         </div>
                                         <NoteLayout filteredNotes={filteredArchivedNotes}
-                                            notes={notes}
-                                            setNotes={setNotes}
                                             sidebaropen={sidebaropen}
                                             setSelectedNote={setSelectedNote}
                                         />
@@ -80,8 +76,6 @@ export const SearchView = ({ notes, sidebaropen, setNotes, searchQuery, setSelec
                                             Trash:
                                         </div>
                                         <NoteLayout filteredNotes={filteredTrashedNotes}
-                                            notes={notes}
-                                            setNotes={setNotes}
                                             sidebaropen={sidebaropen}
                                             setSelectedNote={setSelectedNote}
                                         />

@@ -6,8 +6,6 @@ import { useNoteDeleteMutation } from '../../hooks/useNoteDeleteMutation';
 
 export const NoteLayout = ({
     filteredNotes,
-    notes,
-    setNotes,
     sidebaropen,
     setSelectedNote,
     view,
@@ -15,15 +13,15 @@ export const NoteLayout = ({
     const queryClient = useQueryClient();
     const userName = sessionStorage.getItem('username')
 
-    const updateNoteMutation = useNoteUpdateMutation(userName, setNotes, queryClient);
-    const deleteNoteMutation = useNoteDeleteMutation(userName, setNotes, queryClient);
+    const updateNoteMutation = useNoteUpdateMutation(userName, queryClient);
+    const deleteNoteMutation = useNoteDeleteMutation(userName, queryClient);
 
     const openModal = (note) => {
         setSelectedNote(note);
     }
 
     function handleNoteViewChange(noteId, targetView) {
-        const currentNote = notes.find(note => note.id === noteId );
+        const currentNote = filteredNotes.find(note => note.id === noteId );
         let updatedNote;
         if ((currentNote.view === 'archive' && targetView === 'notes' && currentNote.prevView) ||
                 (currentNote.view === 'trash' && targetView === 'restore' && currentNote.prevView)) {
@@ -32,7 +30,6 @@ export const NoteLayout = ({
                         view: currentNote.prevView, 
                         prevView: undefined, 
                         updated_at: new Date().toISOString(), 
-                        sync_status: 'updated'
                     };
         } else {
             updatedNote ={
@@ -40,23 +37,21 @@ export const NoteLayout = ({
                         prevView: currentNote.view, 
                         view: targetView, 
                         updated_at: new Date().toISOString(), 
-                        sync_status: 'updated'
             };
         }
         updateNoteMutation.mutate(updatedNote);
     }
 
     function handleDeleteNote(noteId) {
-        const deletedNote = notes.find((note) => noteId === note.id)
+        const deletedNote = filteredNotes.find((note) => noteId === note.id)
         deleteNoteMutation.mutate(deletedNote, {
             onSuccess: () => {
-                console.log("Deleted Note: ", { ...deletedNote, updated_at: new Date().toISOString(), sync_status: 'deleted' });
-                console.log("notes state varable after deletion: ", notes)
+                console.log("Deleted Note: ", { ...deletedNote, updated_at: new Date().toISOString() });
+                console.log("notes state varable after deletion: ", filteredNotes);
             },
 
             onError: (error) => console.error("Error deleting note ", error)
         });
-        console.log("deleted note: ", deletedNote)
     }
 
     const breakpointColumnsObj = {
@@ -69,6 +64,24 @@ export const NoteLayout = ({
     }
 
     const { pinnedNotes, otherNotes } = filteredNotes.reduce((acc, note) => (acc[note.pinned ? 'pinnedNotes' : 'otherNotes'].push(note), acc), { pinnedNotes: [], otherNotes: [] })
+
+    const renderCards = (notesList) =>
+        [...notesList].reverse().map((note) => (
+            <div key={note.id}>
+                <Card
+                    id={note.id}
+                    title={note.title}
+                    content={note.content}
+                    bgColor={note.bgColor}
+                    onViewChange={handleNoteViewChange}
+                    onCardClick={() => openModal(note)}
+                    viewType={note.view}
+                    onDelete={handleDeleteNote}
+                    view={view}
+                    pinned={note.pinned}
+                />
+            </div>
+        ))
 
     return (
         <div className='flex flex-col flex-grow h-full overflow-hidden'> 
@@ -84,24 +97,7 @@ export const NoteLayout = ({
                                                 Pinned:
                                             </div>
                                             {
-                                                [...pinnedNotes].reverse().map((note) => {
-                                                    return (
-                                                        <div key={note.id} >
-                                                            <Card id={note.id} title={note.title}
-                                                                content={note.content}
-                                                                bgColor={note.bgColor}
-                                                                onViewChange={handleNoteViewChange}
-                                                                onCardClick={() => openModal(note)}
-                                                                viewType={note.view}
-                                                                onDelete={handleDeleteNote}
-                                                                notes={notes}
-                                                                setNotes={setNotes}
-                                                                view={view}
-                                                                pinned={note.pinned}
-                                                            />
-                                                        </div>
-                                                    )
-                                                })
+                                                renderCards(pinnedNotes)
                                             }
                                         </div>
                                     )
@@ -113,24 +109,7 @@ export const NoteLayout = ({
                                                 Other:
                                             </div>
                                             {
-                                                [...otherNotes].reverse().map((note) => {
-                                                    return (
-                                                        <div key={note.id} >
-                                                            <Card id={note.id} title={note.title}
-                                                                content={note.content}
-                                                                bgColor={note.bgColor}
-                                                                onViewChange={handleNoteViewChange}
-                                                                onCardClick={() => openModal(note)}
-                                                                viewType={note.view}
-                                                                onDelete={handleDeleteNote}
-                                                                notes={notes}
-                                                                setNotes={setNotes}
-                                                                view={view}
-                                                                pinned={note.pinned}
-                                                            />
-                                                        </div>
-                                                    )
-                                                })
+                                                renderCards(otherNotes)
                                             }
                                         </div>
                                     )
@@ -150,24 +129,7 @@ export const NoteLayout = ({
                                             className="my-masonry-grid "
                                             columnClassName="my-masonry-grid_column ">
                                             {
-                                                [...pinnedNotes].reverse().map((note) => {
-                                                    return (
-                                                        <div key={note.id} >
-                                                            <Card id={note.id} title={note.title}
-                                                                content={note.content}
-                                                                bgColor={note.bgColor}
-                                                                onViewChange={handleNoteViewChange}
-                                                                onCardClick={() => openModal(note)}
-                                                                viewType={note.view}
-                                                                onDelete={handleDeleteNote}
-                                                                notes={notes}
-                                                                setNotes={setNotes}
-                                                                view={view}
-                                                                pinned={note.pinned}
-                                                            />
-                                                        </div>
-                                                    )
-                                                })
+                                                renderCards(pinnedNotes)
                                             }
                                         </Masonry>
                                     </div>
@@ -183,24 +145,7 @@ export const NoteLayout = ({
                                             className="my-masonry-grid "
                                             columnClassName="my-masonry-grid_column ">
                                             {
-                                                [...otherNotes].reverse().map((note) => {
-                                                    return (
-                                                        <div key={note.id} >
-                                                            <Card id={note.id} title={note.title}
-                                                                content={note.content}
-                                                                bgColor={note.bgColor}
-                                                                onViewChange={handleNoteViewChange}
-                                                                onCardClick={() => openModal(note)}
-                                                                viewType={note.view}
-                                                                onDelete={handleDeleteNote}
-                                                                notes={notes}
-                                                                setNotes={setNotes}
-                                                                view={view}
-                                                                pinned={note.pinned}
-                                                            />
-                                                        </div>
-                                                    )
-                                                })
+                                                renderCards(otherNotes)
                                             }
                                         </Masonry>
                                     </div>

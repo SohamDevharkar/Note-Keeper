@@ -22,8 +22,6 @@ export const Card = ({
     onCardClick,
     viewType,
     onDelete,
-    notes,
-    setNotes,
     view,
     pinned
 }) => {
@@ -31,7 +29,7 @@ export const Card = ({
     const [showPalette, setShowPalette] = useState(false);
     const queryClient = useQueryClient();
     const userName = sessionStorage.getItem('username');
-    const updateNoteMutation = useNoteUpdateMutation(userName, setNotes, queryClient);
+    const updateNoteMutation = useNoteUpdateMutation(userName, queryClient);
 
 
     let items = [];
@@ -92,8 +90,9 @@ export const Card = ({
 
     function handlePinToggle(e) {
         e.stopPropagation();
-        const selectedNote = notes.find(note => note.id === id);
-        updateNoteMutation.mutate({ ...selectedNote, pinned: !selectedNote.pinned, updated_at: new Date().toISOString(), sync_status: 'updated' });
+        // const selectedNote = notes.find(note => note.id === id);
+        const existingNote = queryClient.getQueryData(['notes', userName])?.find(note => note.id === id);
+        updateNoteMutation.mutate({ ...existingNote, pinned: !pinned, updated_at: new Date().toISOString(), sync_status: 'updated' });
     }
 
     function handleSafeHtml(json) {
@@ -103,8 +102,8 @@ export const Card = ({
 
     return (
         <div className={`group relative ${view ? 'max-w-screen-lg  my-4 min-h-[100px] w-full' : 'sm:max-w-[250px] sm:px-2'} 
-                        hover:border-black border w-90 hover:border-3 dark:hover:border-red-500 min-h-[200px] 
-                        ${bgColor} transition-all duration-100 dark:text-black rounded-md shadow break-inside-avoid 
+                        hover:border-black border w-90 hover:border-3 dark:hover:border-slate-50 min-h-[200px] 
+                        ${bgColor !== 'bg-white'? 'bgColor': 'dark:bg-gray-500 dark:text-slate-300'} transition-all duration-100 dark:text-black rounded-md shadow break-inside-avoid 
                         whitespace-pre-wrap flex flex-col justify-between`
         }
             onClick={onCardClick}>
@@ -140,8 +139,6 @@ export const Card = ({
                                 <Pallete
                                     id={id}
                                     setShowPalette={setShowPalette}
-                                    notes={notes}
-                                    setNotes={setNotes}
                                 />
                             )}
                         </div>
