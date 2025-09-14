@@ -2,21 +2,22 @@ import { useEditor, EditorContent } from '@tiptap/react'
 import { FontSizeCounter } from './FonstSizeCounter';
 import StarterKit from '@tiptap/starter-kit'
 import { TextStyle, FontSize } from '@tiptap/extension-text-style';
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { FaBold } from "react-icons/fa";
 import { ImUnderline } from "react-icons/im";
 import { FiItalic } from "react-icons/fi";
 
-export function TipTapEditor({ value, onChange, placeholder, className, singleLine, showTipTapMenu,}) {
+export function TipTapEditor({ value, onChange, placeholder, className, singleLine, showTipTapMenu }) {
 
     const editor = useEditor({
-        extensions: [StarterKit.configure({
-            history: {
-                depth: 1000,
-            }
-        }),
+        extensions: [
+            StarterKit.configure({
+                history: {
+                    depth: 1000,
+                }
+            }),
             TextStyle,      // needed for styling marks like font size
-        FontSize.configure({ types: ['textStyle'] }),
+            FontSize.configure({ types: ['textStyle'] }),
         ],
         content: value,
         onUpdate: ({ editor }) => {
@@ -39,7 +40,7 @@ export function TipTapEditor({ value, onChange, placeholder, className, singleLi
         if (editor && value && value !== editor.getJSON()) {
             editor.commands.setContent(value);
         }
-    }, [value, editor])
+    }, [editor])
 
     if (!editor) return null
     return (<div>

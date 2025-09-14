@@ -4,7 +4,6 @@ const db = new Dexie('NotesDatabase');
 
 db.version(4).stores({
     notes: 'id, client_id, title, content, view, prevView, bgColor, pinned, user_id, created_at, updated_at, sync_status',
-    mutation_queue: 'id, type, timestamp'
 })
 
 db.open().catch((err) => {
@@ -20,8 +19,4 @@ const clearNotes = async () => {
     await db.notes.clear();
 } 
 
-const clearMutationQueue = async () => {
-    await db.mutation_queue.clear();
-}
-
-export {db, clearNotes, clearMutationQueue}
+export {db, clearNotes}

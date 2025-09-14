@@ -5,68 +5,92 @@ import axios from "axios";
 const updateNoteApi = async (updatedNote) => {
     //for testing
     console.log("updateNoteApi received:", updatedNote);
-    const newNoteToSave= {...updatedNote, 
-        updated_at: new Date().toISOString(), 
-        sync_status: 'synced'
+    const token = sessionStorage.getItem('token');
+    console.log('updatedNote before hitting backend: ')
+    const updatedNoteToSave = {
+        ...updatedNote,
+        updated_at: new Date().toISOString(),
     }
 
-    const token = sessionStorage.getItem('token');
-    
+    if (!token) {
+        throw new Error("Token not found in session storage");
+    }
+
     try {
+        console.log("Hitting backend update note")
         const response = await axios.post(`http://127.0.0.1:5000/api/v1/notes/sync`,
-            { notes: [newNoteToSave] },
+            { notes: [updatedNoteToSave] },
             {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             }
         )
-        await db.notes.put(newNoteToSave);
-        console.log("Saved to IndexedDB:", newNoteToSave);
-        return response.data;
+        const backendNotes = response.data || [];
+        return [...backendNotes];
 
     } catch (error) {
         console.log("Sync failed. Saving as pending:", error?.message || error);
-        const pendingNote = {...newNoteToSave, sync_status: 'pending'}
+        const pendingNote = { ...updatedNoteToSave, sync_status: 'pending' }
         await db.notes.put(pendingNote);
-        await db.mutation_queue.add({
-            id: crypto.randomUUID(),
-            type: 'update',
-            note: pendingNote,
-            timestamp: Date.now()
-        });
-        return pendingNote;
+        throw error; //This should trigger onError
     }
 }
 
-export const useNoteUpdateMutation = (userName, queryClient) => {
+export const useNoteUpdateMutation = (userName, queryClient, isOnline) => {
     const mutation = useMutation({
         mutationFn: updateNoteApi,
         onMutate: async (updatedNote) => {
             await queryClient.cancelQueries(['notes', userName]);
-            const previousNotes = queryClient.getQueryData(['notes', userName]);
+            const previousNotes = queryClient.getQueryData(['notes', userName]) || [];
 
-            const updatedNotes = previousNotes.map(note => note.id === updatedNote.id ? updatedNote : note) || [updatedNote]
-
-            // queryClient.setQueryData(['notes', userName], (old =[]) => 
-            //     old.map(note => note.id === updatedNote.id ? updatedNote : note)
-            // );
-
-         
-
-            queryClient.setQueryData(['notes', userName], updatedNotes);
-            return { previousNotes }
-        },
-
-        onError: (error, updateNote, context) => {
-            if (context?.previousNotes) {
-                queryClient.setQueryData(['notes', userName], context.previousNotes);
+            const optimisticNote = {
+                ...updatedNote,
+                updated_at: new Date().toISOString(),
+                sync_status: 'pending'
             }
-            console.error("Failed to update note: ", error);
+
+            await db.notes.put(optimisticNote)
+            queryClient.setQueryData(['notes', userName], (prev = []) => {
+                const sortedUpdatedList = prev.map(note => note.client_id === optimisticNote.client_id ? optimisticNote : note);
+                return sortedUpdatedList.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+
+            })
+
+            return { previousNotes, optimisticNote };
+        },
+        onSuccess: async (response, _, context) => {
+            console.log("The response in onSuccess: ", response);
+            const confirmedNote = response.find(n => n.client_id === context.optimisticNote.client_id);
+            console.log("The confirmedNote I got: ", confirmedNote);
+            console.log("The optimictic note I got: ", context.optimisticNote)
+            const optimisticNote = context.optimisticNote;
+
+            await db.notes.update(optimisticNote.id, { ...confirmedNote, sync_status: 'synced' })
+            queryClient.setQueryData(['notes', userName], (prev = []) => {
+                const sortedUpdatedList = prev.map(note => note.client_id === confirmedNote.client_id ? confirmedNote : note)
+                return sortedUpdatedList.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+            })
         },
 
-        onSettled: () => {
-            queryClient.invalidateQueries(['notes', userName]);
+        onError: async (error, _, context) => {
+            console.warn("Update failed,  keeping pending note:", error);
+            const fallbackNote = {
+                ...context.optimisticNote,
+                sync_status: 'pending',
+                updated_at: new Date().toISOString()
+            }
+            await db.notes.put(fallbackNote);
+            queryClient.setQueryData(['notes', userName], (prev = []) =>{ 
+                const sortedUpdatedList = prev.map(note => note.client_id === fallbackNote.client_id ? fallbackNote : note)
+                return sortedUpdatedList.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+            });
+        },
+
+        onSettled: async () => {
+            const fresh = await db.notes.where('sync_status').notEqual('deleted').toArray();
+            const freshSortedList = fresh.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+            queryClient.setQueryData(['notes', userName], freshSortedList);
         }
     });
 

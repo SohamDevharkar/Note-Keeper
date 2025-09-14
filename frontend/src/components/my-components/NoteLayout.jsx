@@ -9,19 +9,20 @@ export const NoteLayout = ({
     sidebaropen,
     setSelectedNote,
     view,
+    isOnline
 }) => {
     const queryClient = useQueryClient();
     const userName = sessionStorage.getItem('username')
 
-    const updateNoteMutation = useNoteUpdateMutation(userName, queryClient);
-    const deleteNoteMutation = useNoteDeleteMutation(userName, queryClient);
+    const updateNoteMutation = useNoteUpdateMutation(userName, queryClient, isOnline);
+    const deleteNoteMutation = useNoteDeleteMutation(userName, queryClient, isOnline);
 
     const openModal = (note) => {
         setSelectedNote(note);
     }
 
     function handleNoteViewChange(noteId, targetView) {
-        const currentNote = filteredNotes.find(note => note.id === noteId );
+        const currentNote = filteredNotes.find(note => note.client_id === noteId );
         let updatedNote;
         if ((currentNote.view === 'archive' && targetView === 'notes' && currentNote.prevView) ||
                 (currentNote.view === 'trash' && targetView === 'restore' && currentNote.prevView)) {
@@ -43,7 +44,7 @@ export const NoteLayout = ({
     }
 
     function handleDeleteNote(noteId) {
-        const deletedNote = filteredNotes.find((note) => noteId === note.id)
+        const deletedNote = filteredNotes.find((note) => noteId === note.client_id)
         deleteNoteMutation.mutate(deletedNote, {
             onSuccess: () => {
                 console.log("Deleted Note: ", { ...deletedNote, updated_at: new Date().toISOString() });
@@ -66,10 +67,10 @@ export const NoteLayout = ({
     const { pinnedNotes, otherNotes } = filteredNotes.reduce((acc, note) => (acc[note.pinned ? 'pinnedNotes' : 'otherNotes'].push(note), acc), { pinnedNotes: [], otherNotes: [] })
 
     const renderCards = (notesList) =>
-        [...notesList].reverse().map((note) => (
-            <div key={note.id}>
+        [...notesList].map((note) => (
+            <div key={note.client_id}>
                 <Card
-                    id={note.id}
+                    id={note.client_id}
                     title={note.title}
                     content={note.content}
                     bgColor={note.bgColor}
@@ -79,6 +80,7 @@ export const NoteLayout = ({
                     onDelete={handleDeleteNote}
                     view={view}
                     pinned={note.pinned}
+                    isOnline={isOnline}
                 />
             </div>
         ))

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TipTapEditor } from "./Tiptap";
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { BsPin, BsPinFill, BsTrash } from "react-icons/bs";
@@ -8,16 +8,14 @@ import { Pallete } from "./Pallete";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNoteUpdateMutation } from "../../hooks/useNoteUpdateMutation";
 
-export const ModalView = ({ selectedNote, setSelectedNote}) => {
+export const ModalView = ({ selectedNote, setSelectedNote, showPalette, setShowPalette }) => {
     const [title, setTitle] = useState(selectedNote.title)
     const [content, setContent] = useState(selectedNote.content);
     const [showTipTapMenu, setShowTipTapMenu] = useState(false);
-    const [showPalette, setShowPalette] = useState(false);
     const [bgColor, setBgColor] = useState(selectedNote.bgColor || 'bg-white');
     const [pinned, setPinned] = useState(selectedNote.pinned);
-
+    const wrapperRef = useRef(null);
     const viewType = selectedNote.view;
-
     let items = []
 
     if (viewType === 'archive') {
@@ -60,8 +58,8 @@ export const ModalView = ({ selectedNote, setSelectedNote}) => {
                 icon: IoColorPaletteOutline
             },
             {
-            title: "Format",
-            icon: MdFormatColorText
+                title: "Format",
+                icon: MdFormatColorText
             },
         ]
     }
@@ -70,60 +68,56 @@ export const ModalView = ({ selectedNote, setSelectedNote}) => {
         setSelectedNote(null);
     }
 
+    useEffect(() => {
+        function handleCloseOutside(e) {
+            if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+                closeModal();
+            }
+        }
+        if (selectedNote) {
+            document.addEventListener('mousedown', handleCloseOutside)
+        }
+        return () => document.removeEventListener('mousedown', handleCloseOutside);
+    }, [selectedNote]);
+    
     const queryClient = useQueryClient();
     const userName = sessionStorage.getItem('username')
-
     const updateNoteMutation = useNoteUpdateMutation(userName, queryClient);
 
-    //for testing
-    useEffect(() => {
-        console.log("Color changed:", bgColor);
-    }, [bgColor]);
-
-
     function handleSubmit() {
-        const updatedNote = { 
+        const updatedNote = {
             ...selectedNote,
             title: title,
-            content: content, 
-            bgColor: bgColor, 
-            pinned: pinned, 
-            updated_at: new Date().toISOString(), 
-            sync_status: 'updated' 
+            content: content,
+            bgColor: bgColor,
+            pinned: pinned,
+            updated_at: new Date().toISOString(),
+            sync_status: 'pending'
         };
-
         //for testing:
         console.log("Submitting updated note:", updatedNote);
 
-        updateNoteMutation.mutate(updatedNote, {
-            onSuccess: () => {
-                // setSelectedNote(updatedNote)
-                queryClient.invalidateQueries(['notes', userName]);
-                closeModal();
-            }
-        })
-
+        updateNoteMutation.mutate(updatedNote);
+        closeModal();
     }
 
     function handleNoteViewChange(selectedNote, targetView) {
         const updatedNote = {
             ...selectedNote,
             updated_at: new Date().toISOString(),
-            prevView: selectedNote.view, 
-            view: targetView, 
+            prevView: selectedNote.view,
+            view: targetView,
             sync_status: 'pending'
         }
-        
-        updateNoteMutation.mutate(updatedNote, {
-            onSuccess: () => closeModal()
-        })
+
+        updateNoteMutation.mutate(updatedNote);
+        closeModal()
     }
 
     return (
-        <div className="fixed inset-0 z-50 
-                                flex justify-center items-center">
+        <div className="fixed inset-0 z-50 flex justify-center items-center">
             <div className="bg-black opacity-40 absolute inset-0" />
-            <div className={`relative transition-all duration-300 ${bgColor ? bgColor : 'dark:bg-gray-700'} border-2 border-gray-500 
+            <div ref={wrapperRef} className={`relative transition-all duration-300 ${bgColor ? bgColor : 'dark:bg-gray-700'} border-2 border-gray-500 
                 min-h-[600px] w-150 rounded-md `}>
 
                 <div className={`max-w-full h-full  border-4 my-2 border-transparent rounded-md`}>
@@ -162,10 +156,11 @@ export const ModalView = ({ selectedNote, setSelectedNote}) => {
                                             </button>
                                             {
                                                 showPalette && <Pallete
-                                                    id={selectedNote.id}
+                                                    id={selectedNote.client_id}
                                                     setShowPalette={setShowPalette}
                                                     bgColor={bgColor}           // pass current local color
                                                     setBgColor={setBgColor}
+                                                    selectedNote={selectedNote}
                                                 />
                                             }
                                         </div>
@@ -174,7 +169,7 @@ export const ModalView = ({ selectedNote, setSelectedNote}) => {
                                             title={item.title}
                                             className={`text-gray-600 hover:text-black hover:bg-slate-100 
                                                         h-8 w-8 rounded-full flex justify-center items-center  `}
-                                            onClick={() => {                                                
+                                            onClick={() => {
                                                 item.title === "Format" ? setShowTipTapMenu(!showTipTapMenu) : handleNoteViewChange(selectedNote, item.view);
                                             }}>
                                             <item.icon size={20} />

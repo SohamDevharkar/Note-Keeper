@@ -2,7 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useNoteUpdateMutation } from "../../hooks/useNoteUpdateMutation";
 import { useEffect } from "react";
 
-export const Pallete = ({ id, setShowPalette, setBgColor,}) => {
+export const Pallete = ({ id, setShowPalette, setBgColor, isOnline, selectedNote}) => {
     
     const Colors = [
         'bg-white',
@@ -18,25 +18,13 @@ export const Pallete = ({ id, setShowPalette, setBgColor,}) => {
     const updateNoteMutation = useNoteUpdateMutation(userName, queryClient);
 
     const onColorChange = (targetColor) => {
-        if(id) {
-            // console.log("Checking notesList state variable", noteList);
-            // const updatedNotes = notes.map((note) => {
-            //     if (id === note.id) {
-            //         const updatedNoteWithBgColor = { ...note, bgColor: targetColor, updated_at: new Date().toISOString(), sync_status: 'updated' }
-            //         updateNoteMutation.mutate(updatedNoteWithBgColor);
-            //         // return { ...note, bgColor: targetColor }
-            //         return updatedNoteWithBgColor
-            //     }
-            //     return note;
-            // })
-            // setNotes(updatedNotes); 
-            
-            const existingNote = queryClient.getQueryData(['notes', userName])?.find(note => note.id === id);
+        if(id && !selectedNote) {          
+            const existingNote = queryClient.getQueryData(['notes', userName])?.find(note => note.client_id === id);
             updateNoteMutation.mutate({
                 ...existingNote,
                 bgColor: targetColor, 
                 updated_at: new Date().toISOString(), 
-                sync_status: 'pending'
+                sync_status: isOnline ? 'synced' :'pending'
             })
         }
 

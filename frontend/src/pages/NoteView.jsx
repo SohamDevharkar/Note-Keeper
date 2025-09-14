@@ -25,13 +25,16 @@ export const NoteView = ({ sidebaropen,
 
   return (<>
     <div className={`min-h-[100px] dark:bg-gray-900 transition-all w-full duration-300`}>
-      <NoteInput inputOpen={inputOpen} setInputOpen={setInputOpen} isOnline={isOnline} />
+      <NoteInput inputOpen={inputOpen} 
+        setInputOpen={setInputOpen} 
+        isOnline={isOnline} />
     </div>
     <div className={`pt-8 min-h-[582px] flex flex-col ${sidebaropen ? 'w-full' : 'max-w-screen'} dark:bg-gray-900`}>
       <NoteLayout filteredNotes={filteredNotes} 
         sidebaropen={sidebaropen}
         setSelectedNote={setSelectedNote}
         view={view}
+        isOnline={isOnline}
       />
     </div>
   </>)

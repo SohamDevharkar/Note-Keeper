@@ -19,7 +19,6 @@ export const NoteInput = ({inputOpen, setInputOpen, isOnline }) => {
     const wrapperRef = useRef(null);
     const titleRef = useRef();
     const userName = sessionStorage.getItem('username');
-
     const createNoteMutation = useCreateNoteMutation(userName, queryClient)
 
     useEffect(() => {
@@ -40,7 +39,6 @@ export const NoteInput = ({inputOpen, setInputOpen, isOnline }) => {
         } 
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [inputOpen, title, content,])
-
 
     function handleClose() {
         if (!title.trim() && !content.trim()) {
@@ -143,6 +141,7 @@ export const NoteInput = ({inputOpen, setInputOpen, isOnline }) => {
                                     id={undefined}
                                     setShowPalette={setShowPalette}
                                     setBgColor={setBgColor}
+                                    isOnline={isOnline}
                                 />
                             )}
                             <button title="Close" className="text-sm px-3 py-1 h-10 w-18 bg-gray-200 dark:bg-gray-600

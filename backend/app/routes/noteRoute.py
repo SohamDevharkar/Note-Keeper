@@ -186,6 +186,7 @@ def sync_notes(user_id):
                 existing_note.bgColor = client_note.get('bgColor', 'bg-white')
                 existing_note.updated_at = client_note_updated_at
                 existing_note.client_id = client_note.get('client_id')
+                db.session.add(existing_note)
                 sync_note_ids.add(existing_note.id)
         else:
             # Create new note
