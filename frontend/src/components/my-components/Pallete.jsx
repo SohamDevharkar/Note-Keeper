@@ -15,7 +15,7 @@ export const Pallete = ({ id, setShowPalette, setBgColor, isOnline, selectedNote
 
     const queryClient = useQueryClient();
     const userName = sessionStorage.getItem('username')
-    const updateNoteMutation = useNoteUpdateMutation(userName, queryClient);
+    const updateNoteMutation = useNoteUpdateMutation(userName, queryClient, isOnline);
 
     const onColorChange = (targetColor) => {
         if(id && !selectedNote) {          

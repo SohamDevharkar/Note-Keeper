@@ -8,11 +8,11 @@ import { Pallete } from "./Pallete";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNoteUpdateMutation } from "../../hooks/useNoteUpdateMutation";
 
-export const ModalView = ({ selectedNote, setSelectedNote, showPalette, setShowPalette }) => {
+export const ModalView = ({ selectedNote, setSelectedNote, showPalette, setShowPalette, isOnline }) => {
     const [title, setTitle] = useState(selectedNote.title)
     const [content, setContent] = useState(selectedNote.content);
     const [showTipTapMenu, setShowTipTapMenu] = useState(false);
-    const [bgColor, setBgColor] = useState(selectedNote.bgColor || 'bg-white');
+    const [bgColor, setBgColor] = useState(selectedNote.bgColor || 'bg-gray-100');
     const [pinned, setPinned] = useState(selectedNote.pinned);
     const wrapperRef = useRef(null);
     const viewType = selectedNote.view;
@@ -82,7 +82,7 @@ export const ModalView = ({ selectedNote, setSelectedNote, showPalette, setShowP
     
     const queryClient = useQueryClient();
     const userName = sessionStorage.getItem('username')
-    const updateNoteMutation = useNoteUpdateMutation(userName, queryClient);
+    const updateNoteMutation = useNoteUpdateMutation(userName, queryClient,isOnline);
 
     function handleSubmit() {
         const updatedNote = {
@@ -161,6 +161,7 @@ export const ModalView = ({ selectedNote, setSelectedNote, showPalette, setShowP
                                                     bgColor={bgColor}           // pass current local color
                                                     setBgColor={setBgColor}
                                                     selectedNote={selectedNote}
+                                                    isOnline={isOnline}
                                                 />
                                             }
                                         </div>

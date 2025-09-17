@@ -21,23 +21,39 @@ export const useFetchAndLoad = (queryClient, userName, isOnline) => {
                     const localNote = localNotes.find(n => n.client_id === backendNote.client_id);
 
                     if (!localNote) return backendNote;
+                    if (localNote.sync_status === 'deleted') return localNote;
                     const backendTime = new Date(backendNote.updated_at).getTime();
-                    const localTime = new Date(localNote.updated_at).getTime();
+                    const localTime = new Date(localNote.updated_at).getTime()
 
                     // If local is newer, keep it and mark as pending
-                    return localTime > backendTime ? 
-                         {...localNote, sync_status: 'pending'} : backendNote ;
-                });
+                    const timeDiff = localNote - backendTime;
+                    console.log("timeDiff: ", timeDiff);
+                    if (timeDiff > 0) {
+                        return { ...localNote, sync_status: 'pending' }
+                    } else {
+                        return { ...backendNote, id: localNote.id, sync_status: 'synced' }
+                    }
 
+                    // return localTime > backendTime ? 
+                    //      {...localNote, sync_status: 'pending'} : { ...backendNote, sync_status: 'synced' }; ;
+                });
+                console.log("mergedNotes: ", mergedNotes);
                 // Include any local notes not present in backend
                 const orphanLocals = localNotes.filter(local =>
                     !backendFiltered.some(note => note.client_id === local.client_id)
                 );
+                console.log("orphanedNotes: ", orphanLocals);
 
-                const finalNotes = [...mergedNotes, ...orphanLocals];
+                const finalNotes = [...mergedNotes, ...orphanLocals].filter(n => n.sync_status != 'deleted');
                 finalNotes.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
 
+                // console.log('Final notes before bulkPut:', finalNotes);
+
                 await db.notes.bulkPut(finalNotes);
+
+                const allNotes = await db.notes.toArray();
+                // console.log('IndexedDB notes after sync:', allNotes);
+
                 queryClient.setQueryData(['notes', userName], finalNotes);
                 return finalNotes;
 
@@ -58,6 +74,6 @@ export const useFetchAndLoad = (queryClient, userName, isOnline) => {
         queryKey: ['notes', userName],
         queryFn: () => fetchNotes()
     })
-    
+
     return query
 }

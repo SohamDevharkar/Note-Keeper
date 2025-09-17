@@ -45,14 +45,7 @@ export const NoteLayout = ({
 
     function handleDeleteNote(noteId) {
         const deletedNote = filteredNotes.find((note) => noteId === note.client_id)
-        deleteNoteMutation.mutate(deletedNote, {
-            onSuccess: () => {
-                console.log("Deleted Note: ", { ...deletedNote, updated_at: new Date().toISOString() });
-                console.log("notes state varable after deletion: ", filteredNotes);
-            },
-
-            onError: (error) => console.error("Error deleting note ", error)
-        });
+        deleteNoteMutation.mutate(deletedNote);
     }
 
     const breakpointColumnsObj = {

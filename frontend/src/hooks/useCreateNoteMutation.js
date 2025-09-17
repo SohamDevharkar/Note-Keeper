@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { db } from "../utils/indexedDB";
 import axios from "axios";
+import { enqueueMutation } from "../utils/mutationQueue";
 
 const createNoteApi = async (noteData) => {
     console.log('hitting backend create note')
@@ -58,6 +59,11 @@ export const useCreateNoteMutation = (userName, queryClient, isOnline) => {
                 return appendedNoteList.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
 
             })
+
+            if(!isOnline) {
+                console.log("isOnline value for creating: ", isOnline)
+                await enqueueMutation('create', optimisticNote)
+            }
 
             return { previousNoteList, optimisticNote }
         },

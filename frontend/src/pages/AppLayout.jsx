@@ -26,14 +26,6 @@ export const AppLayout = ({
     const queryClient = useQueryClient()
     const userName = sessionStorage.getItem('userName');
 
-    // useEffect(() => {
-    //     if(navigator.onLine) {
-    //         syncManager().then(() => {
-    //             queryClient.invalidateQueries(['notes', userName]);
-    //         })
-    //     }
-    // }, [navigator.onLine]);
-
     return (
         <>
             <div className='flex h-screen overflow-hidden'>
@@ -65,6 +57,7 @@ export const AppLayout = ({
                         setSelectedNote={setSelectedNote}
                         showPalette={showPalette}
                         setShowPalette={setShowPalette}
+                        isOnline={isOnline}
                     />
                 }
             </div>

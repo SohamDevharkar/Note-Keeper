@@ -11,11 +11,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { LandingPage } from './pages/LandingPage.jsx';
 import { ProtectedRoutes } from './components/my-components/ProtectedRoutes.jsx';
 import { useBackendStatus } from './hooks/useBackendStatus.js';
+import { processMutationQueue } from './utils/mutationQueue.js';
 
 const queryClient = new QueryClient();
 
 function App() {
-  const userName = sessionStorage.getItem('username');
   const [loginState, setLoginState] = useState(false);
   const [sidebaropen, setSidebarOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
@@ -28,6 +28,13 @@ function App() {
   });
 
   const isOnline = useBackendStatus();
+
+  useEffect(() => {
+    if(isOnline && sessionStorage.getItem('token')) {
+      console.log('Backend reachable, syncing mutation queue...');
+      processMutationQueue()
+    }
+  },[isOnline]) 
 
   useEffect(() => {
     const root = document.documentElement;

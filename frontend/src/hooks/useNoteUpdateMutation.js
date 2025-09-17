@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { db } from "../utils/indexedDB";
 import axios from "axios";
+import { enqueueMutation } from "../utils/mutationQueue";
 
 const updateNoteApi = async (updatedNote) => {
     //for testing
@@ -57,6 +58,11 @@ export const useNoteUpdateMutation = (userName, queryClient, isOnline) => {
 
             })
 
+            if (!isOnline) {
+                console.log("isOnline status for updating: ", isOnline);
+                await enqueueMutation('update', optimisticNote)
+            }
+
             return { previousNotes, optimisticNote };
         },
         onSuccess: async (response, _, context) => {
@@ -81,7 +87,7 @@ export const useNoteUpdateMutation = (userName, queryClient, isOnline) => {
                 updated_at: new Date().toISOString()
             }
             await db.notes.put(fallbackNote);
-            queryClient.setQueryData(['notes', userName], (prev = []) =>{ 
+            queryClient.setQueryData(['notes', userName], (prev = []) => {
                 const sortedUpdatedList = prev.map(note => note.client_id === fallbackNote.client_id ? fallbackNote : note)
                 return sortedUpdatedList.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
             });

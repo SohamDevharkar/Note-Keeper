@@ -2,8 +2,10 @@ import Dexie from 'dexie'
 
 const db = new Dexie('NotesDatabase');
 
-db.version(4).stores({
+db.version(7).stores({
     notes: 'id, client_id, title, content, view, prevView, bgColor, pinned, user_id, created_at, updated_at, sync_status',
+    mutationQueue: '++id, type, client_id, updated_at, status'
+
 })
 
 db.open().catch((err) => {
@@ -18,5 +20,9 @@ db.on('populate', () => console.log('Database populated'));
 const clearNotes = async () => {
     await db.notes.clear();
 } 
+
+const clearMutationQueue = async () =>{
+  await db.mutationQueue.clear();
+}
 
 export {db, clearNotes}

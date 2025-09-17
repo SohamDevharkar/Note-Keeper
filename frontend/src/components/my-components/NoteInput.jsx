@@ -19,7 +19,7 @@ export const NoteInput = ({inputOpen, setInputOpen, isOnline }) => {
     const wrapperRef = useRef(null);
     const titleRef = useRef();
     const userName = sessionStorage.getItem('username');
-    const createNoteMutation = useCreateNoteMutation(userName, queryClient)
+    const createNoteMutation = useCreateNoteMutation(userName, queryClient, isOnline)
 
     useEffect(() => {
         if (inputOpen && titleRef.current) {
