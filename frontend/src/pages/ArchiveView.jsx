@@ -1,8 +1,8 @@
 import { RiInboxArchiveLine } from "react-icons/ri";
 import { NoteLayout } from "../components/my-components/NoteLayout"
-import { useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useFetchAndLoad } from "../hooks/useFetchAndLoad";
+import { Spinner } from "../components/my-components/Loader";
 
 export const ArchiveView = ({
     sidebaropen,
@@ -28,8 +28,8 @@ export const ArchiveView = ({
 
     console.log("isArrayNullOrEmpty: " + isArrayNullOrEmpty(filteredArchiveNotes));
 
-    if(isLoading) return <div>Loading archived notes...</div>
-    if(isError && filteredArchiveNotes.length) return <div>Error Loading archived notes...</div>
+    if(isLoading) return <div className="flex flex-col justify-center w-full h-full items-center"><Spinner /></div>
+    if(isError) return <div>Error Loading archived notes...</div>
 
     return <div className={`${isArrayNullOrEmpty(filteredArchiveNotes) ? 'fixed' : ''}  h-full sm:w-full`}>
         {

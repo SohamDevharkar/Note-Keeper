@@ -29,18 +29,17 @@ export const SidebarBox = ({ sidebaropen}) => {
     const navigate = useNavigate();   
 
     return (
-        //new code
-        <div className={`fixed top-16 group hover:border h-screen left-0 
-            flex flex-col py-4  transition-all duration-300 
+        <div className={`fixed top-16 group h-screen left-0 
+            flex flex-col py-4  transition-all duration-300  border-slate-200
             ease-in-out z-50 sm:z-10 hover:shadow-lg  bg-white dark:bg-gray-900
-            ${sidebaropen ? 'w-56 border ' : 'w-18 hover:w-56'}`}>
+            ${sidebaropen ? 'w-56 border-r' : 'w-18 hover:w-56'}`}>
             {items.map((item) => {
                 const route = item.view === 'notes' ? '/home' : `/${item.view}`
                 return (
                     <div key={item.title} onClick={()=>{
                         navigate(route)}}
                         className="flex items-center gap-4 px-5 py-3 dark:hover:bg-slate-600
-                        hover:bg-slate-200 rounded-xl h-14 relative 
+                        hover:bg-slate-200 rounded-2xl h-14 relative 
                             transaction-all duration-300">
                         {/* {console.log(item.title)} */}
                         <a href={item.url}>

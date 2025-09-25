@@ -7,6 +7,5 @@ export const ProtectedRoutes= ({children}) => {
         alert("login first")
         return <Navigate to='/signin' replace />
     } 
-
     return children;
 }

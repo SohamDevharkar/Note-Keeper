@@ -2,7 +2,7 @@ import { BsTrash } from "react-icons/bs"
 import { NoteLayout } from "../components/my-components/NoteLayout";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFetchAndLoad } from "../hooks/useFetchAndLoad";
-import { useEffect } from "react";
+import { Spinner } from "../components/my-components/Loader";
 
 export const TrashView = ({
     sidebaropen,
@@ -13,14 +13,7 @@ export const TrashView = ({
     const queryClient = useQueryClient()
     const userName = sessionStorage.getItem('username');
     const { data: noteList = [], isLoading, error, isError } = useFetchAndLoad(queryClient, userName, isOnline);
-
-    // useEffect(() => {
-    //     if (data && data.length > 0) {
-    //         setNotes(data);
-    //     }
-    // }, [data, setNotes])
-
-    const filteredTrashNotes = noteList.filter((note) => note.view === 'trash' && note.sync_status !== "SyncStatus.deleted");
+    const filteredTrashNotes = noteList.filter((note) => note.view === 'trash');
 
     function isArrayNullOrEmpty(filteredTrashNotes) {
         return filteredTrashNotes === null || filteredTrashNotes === undefined || (Array.isArray(filteredTrashNotes) && filteredTrashNotes.length === 0);
@@ -28,8 +21,11 @@ export const TrashView = ({
 
     console.log("isArrayNullOrEmpty: " + isArrayNullOrEmpty(filteredTrashNotes));
 
-    if (isLoading) return <div>Loading notes....</div>
-    if (isError && filteredTrashNotes.length) return <div>Error Loading notes</div>
+    if (isLoading) return <div className="flex flex-col justify-center w-full h-full items-center"><Spinner/></div>
+    if (isError){
+        console.log("Error Loading: ", error);
+        return <div>Error Loading notes</div>
+    } 
 
     return <div className={`${isArrayNullOrEmpty(filteredTrashNotes) ? 'fixed' : 'relative'} h-full p-2 sm:w-full dark:bg-gray-900`}>
         {
@@ -42,6 +38,7 @@ export const TrashView = ({
                 <NoteLayout filteredNotes={filteredTrashNotes}
                     sidebaropen={sidebaropen}
                     view={view}
+                    isOnline={isOnline}
                 />
             )
         }

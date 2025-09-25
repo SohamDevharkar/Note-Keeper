@@ -2,15 +2,29 @@ import axios from "axios";
 import { db } from "./indexedDB";
 
 export const enqueueMutation = async (type, note) => {
-    const mutation = {
-        type: type,
-        client_id: note.client_id,
-        updated_at: new Date().toISOString(),
-        note: note,
-        status: 'pending'
+
+    const existingMutations = await db.mutationQueue.where('client_id').equals(note.client_id).toArray();
+    console.log("Existing mutations: ", existingMutations);
+
+    if (existingMutations.length > 0) {
+        console.log("updating existing mutation....")
+        const [existingMutation] = existingMutations;
+        await db.mutationQueue.update(existingMutation.id, {
+            type: type,
+            note: { ...note },
+            updated_at: new Date().toISOString(),
+            status: 'pending'
+        })
+    } else {
+        console.log("creating new mutation....")
+        await db.mutationQueue.add({
+            type: type,
+            client_id: note.client_id,
+            updated_at: new Date().toISOString(),
+            note: { ...note },
+            status: 'pending'
+        })
     }
-    await db.mutationQueue.add(mutation);
-    console.log(`Enqueued ${type} mutation for note ${note.client_id}`)
 }
 
 export const processMutationQueue = async () => {
@@ -24,37 +38,41 @@ export const processMutationQueue = async () => {
     }
 
     for (const mutation of pendingMutations) {
-       
+
         console.log(`updating update_at prop for ${mutation.note.title}`)
         try {
-            const pendingNote = {...mutation.note, updated_at: new Date().toISOString() }
-            const response = await axios.post('http://127.0.0.1:5000/api/v1/notes/sync', {
-                notes: [pendingNote]
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+            const pendingNote = { ...mutation.note, updated_at: new Date().toISOString() }
+            const response = await axios.post('http://127.0.0.1:5000/api/v1/notes/sync',
+                { notes: [pendingNote] },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
             const confirmedNote = Array.isArray(response.data)
                 ? response.data.find(n => n.client_id === mutation.client_id)
                 : response.data;
-
+            console.log("confirmedNote received: ", confirmedNote);
             // Apply confirmed mutation locally
             if (mutation.type === 'delete') {
+                console.log("actually deleting the note from indexedDB.")
                 await db.notes.delete(pendingNote.id);
+
             } else {
                 const existingNote = await db.notes.get(mutation.client_id);
-                const incomingNote = confirmedNote ? {...confirmedNote , sync_status: "synced"} : {...mutation.note , sync_status: 'pending'}
+                const incomingNote = confirmedNote ? { ...confirmedNote, sync_status: "synced" } : { ...mutation.note, sync_status: 'pending' }
                 if (!existingNote || new Date(incomingNote.updated_at) > new Date(existingNote.updated_at)) {
                     await db.notes.put(incomingNote);
                 } else {
                     console.log(`Skipped update: local note is newer than incoming`)
                 }
             }
-            await db.mutationQueue.update(mutation.id, { status: 'synced' });
+            await db.mutationQueue.update(mutation.id, { ...mutation, status: 'synced' });
+            console.log("mutation successful for the ID: ", mutation.id);
+            await db.mutationQueue.delete(mutation.id);
         } catch (err) {
             console.warn(`Failed to sync mutation ${mutation.id}:`, err);
-            await db.mutationQueue.update(mutation.id, { status: 'failed' });
+            await db.mutationQueue.update(mutation.id, { ...mutation, status: 'failed' });
         }
     }
 };

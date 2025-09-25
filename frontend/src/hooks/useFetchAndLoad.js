@@ -26,7 +26,7 @@ export const useFetchAndLoad = (queryClient, userName, isOnline) => {
                     const localTime = new Date(localNote.updated_at).getTime()
 
                     // If local is newer, keep it and mark as pending
-                    const timeDiff = localNote - backendTime;
+                    const timeDiff = localTime - backendTime;
                     console.log("timeDiff: ", timeDiff);
                     if (timeDiff > 0) {
                         return { ...localNote, sync_status: 'pending' }
@@ -63,10 +63,12 @@ export const useFetchAndLoad = (queryClient, userName, isOnline) => {
                 return fallbackNotes;
             }
         } else {
-            const localNotes = db.notes.where('sync_status').notEquals('deleted').toArray();
+            const localNotes = await db.notes.where('sync_status').notEqual('deleted').toArray();
             // return response;
-            queryClient.setQueryData(['notes', userName], localNotes)
-            return localNotes;
+            const sortedNotes = localNotes.sort((a,b) => new Date(b.updated_at) - new Date(a.updated_at));
+            queryClient.setQueryData(['notes', userName], sortedNotes)
+            console.log("localNotes in offline mode: ", sortedNotes);
+            return sortedNotes;
         }
     }
 

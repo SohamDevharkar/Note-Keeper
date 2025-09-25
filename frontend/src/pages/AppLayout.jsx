@@ -2,9 +2,8 @@ import { Outlet } from "react-router-dom"
 import { Header } from "../components/my-components/Header"
 import { SidebarBox } from "../components/my-components/Sidebar"
 import { ModalView } from "../components/my-components/ModalView"
-import { syncManager } from "../utils/syncManager"
 import { useEffect } from "react"
-import { useQueryClient } from "@tanstack/react-query"
+import { processMutationQueue } from "../utils/mutationQueue"
 
 export const AppLayout = ({
     sidebaropen,
@@ -17,14 +16,21 @@ export const AppLayout = ({
     setSelectedNote,
     showPalette,
     setShowPalette,
-    loginState,
     setLoginState,
     isDarkMode,
     setIsDarkMode,
     isOnline
 }) => {
-    const queryClient = useQueryClient()
-    const userName = sessionStorage.getItem('userName');
+
+    useEffect(() => {
+        if (isOnline && sessionStorage.getItem('token')) {
+            console.log('Backend reachable, syncing mutation queue...');
+            processMutationQueue()
+        } else {
+            alert('You are working in offline mode!!')
+        }
+    }, [isOnline])
+
 
     return (
         <>
@@ -35,10 +41,10 @@ export const AppLayout = ({
                     setSearchQuery={setSearchQuery}
                     view={view}
                     setView={setView}
-                    loginState={loginState}
                     setLoginState={setLoginState}
                     isDarkMode={isDarkMode}
                     setIsDarkMode={setIsDarkMode}
+                    isOnline={isOnline}
 
                 />
                 <SidebarBox sidebaropen={sidebaropen}

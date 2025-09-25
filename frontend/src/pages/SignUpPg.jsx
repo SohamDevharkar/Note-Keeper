@@ -27,11 +27,8 @@ export function SignUpForm() {
     })
 
     const handleOnSubmit = (data) => {
-        const { firstName, lastName, email, password } = data;
         console.log("sign up data: ", JSON.stringify(data));
-        //
         mutate(data);
-        // alert("User signed up!");
         reset();
         
     }

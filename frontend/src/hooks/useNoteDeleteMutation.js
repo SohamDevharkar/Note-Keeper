@@ -62,8 +62,8 @@ export const useNoteDeleteMutation = (userName, queryClient, isOnline) => {
             const confirmedNote = Array.isArray(response)
                 ? response.find(n => n.client_id === context.optimisticNote.client_id)
                 : context.optimisticNote;
-            console.log('')
-            await db.notes.delete(context.optimisticNote.client_id);
+            console.log('checking confirmed note:', confirmedNote);
+            await db.notes.delete(confirmedNote.id);
 
             queryClient.setQueryData(['notes', userName], (prev = []) => prev.filter(n => n.client_id !== confirmedNote.client_id))
         },

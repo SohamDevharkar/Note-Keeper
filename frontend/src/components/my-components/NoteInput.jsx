@@ -92,15 +92,15 @@ export const NoteInput = ({inputOpen, setInputOpen, isOnline }) => {
             {!inputOpen ? (
                 //collapsed state
                 <div onClick={() => setInputOpen(true)}
-                    className="bg-white shadow-md rounded-xl px-4 py-3 dark:bg-gray-700
-                    cursor-text border hover:shadow-lg transition-all duration-300">
-                    <span className="text-gray-500 dark:text-gray-200">
+                    className="bg-white shadow-md rounded-4xl px-4 py-3 dark:bg-gray-700
+                    cursor-text border-none hover:shadow-lg transition-all duration-300">
+                    <span className="text-gray-500 dark:text-gray-200 ">
                         Take a note...
                     </span>
                 </div>
             ) : (
                 //expanded state
-                <div className={`shadow-xl rounded-xl px-4 py-4 transition-all duration-300 z-100 min-h-[150px] ${bgColor === 'bg-white' ? 'dark:bg-gray-700' : bgColor}`}>
+                <div className={`shadow-xl rounded-2xl px-4 py-2 transition-all duration-300 z-100 min-h-[150px] ${bgColor === 'bg-white' ? 'dark:bg-gray-700' : bgColor}`}>
                     <input ref={titleRef} placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)}
                         className={`w-full text-lg font-medium focus:outline-none mb-4 border-b 
                         dark:text-gray-200   ${bgColor !== 'bg-white' ? 'dark:placeholder:text-black': 'dark:placeholder:text-gray-200'}`} />
@@ -144,8 +144,8 @@ export const NoteInput = ({inputOpen, setInputOpen, isOnline }) => {
                                     isOnline={isOnline}
                                 />
                             )}
-                            <button title="Close" className="text-sm px-3 py-1 h-10 w-18 bg-gray-200 dark:bg-gray-600
-                                hover:bg-slate-200 dark:hover:bg-green-400 rounded-md"  onClick={() =>{
+                            <button title="Close" className="text-sm px-3 py-1 h-10 w-18 bg-gray-200 dark:bg-gray-600 rounded-2xl
+                                hover:bg-slate-200 dark:hover:bg-green-400"  onClick={() =>{
                                     handleClose(); setBgColor('bg-white')}}>
                                 Close
                             </button>

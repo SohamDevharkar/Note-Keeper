@@ -11,7 +11,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { LandingPage } from './pages/LandingPage.jsx';
 import { ProtectedRoutes } from './components/my-components/ProtectedRoutes.jsx';
 import { useBackendStatus } from './hooks/useBackendStatus.js';
-import { processMutationQueue } from './utils/mutationQueue.js';
+
 
 const queryClient = new QueryClient();
 
@@ -29,12 +29,6 @@ function App() {
 
   const isOnline = useBackendStatus();
 
-  useEffect(() => {
-    if(isOnline && sessionStorage.getItem('token')) {
-      console.log('Backend reachable, syncing mutation queue...');
-      processMutationQueue()
-    }
-  },[isOnline]) 
 
   useEffect(() => {
     const root = document.documentElement;
@@ -58,8 +52,7 @@ function App() {
           } />
 
           <Route path='/signin' element={
-            <SignInForm loginState={loginState} setLoginState={setLoginState}
-              isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+            <SignInForm/>
           } />
 
           <Route element={<AppLayout

@@ -94,7 +94,6 @@ export const ModalView = ({ selectedNote, setSelectedNote, showPalette, setShowP
             updated_at: new Date().toISOString(),
             sync_status: 'pending'
         };
-        //for testing:
         console.log("Submitting updated note:", updatedNote);
 
         updateNoteMutation.mutate(updatedNote);
@@ -188,7 +187,6 @@ export const ModalView = ({ selectedNote, setSelectedNote, showPalette, setShowP
                         </button>
                     </div>
                 </div>
-
             </div>
         </div>
     )

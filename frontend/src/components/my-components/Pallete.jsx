@@ -1,6 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useNoteUpdateMutation } from "../../hooks/useNoteUpdateMutation";
-import { useEffect } from "react";
 
 export const Pallete = ({ id, setShowPalette, setBgColor, isOnline, selectedNote}) => {
     

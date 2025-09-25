@@ -1,8 +1,8 @@
 import { NoteInput } from "../components/my-components/NoteInput"
 import { NoteLayout } from "../components/my-components/NoteLayout"
 import { useQueryClient} from "@tanstack/react-query"
-import { useEffect } from 'react'
 import { useFetchAndLoad } from "../hooks/useFetchAndLoad"
+import { Spinner } from "../components/my-components/Loader"
 
 export const NoteView = ({ sidebaropen,
   inputOpen,
@@ -18,10 +18,9 @@ export const NoteView = ({ sidebaropen,
   const {data: noteList = [], isLoading, error, isError} = useFetchAndLoad(queryClient, userName, isOnline);
 
   const filteredNotes = noteList.filter(note => note && note.view === 'notes') || [];
-  // console.log(`note view for ${userName}: `,filteredNotes);
 
-  if(isLoading) return <div>Loading notes....</div>
-  if(isError && filteredNotes.length === 0 ) return <div>Error Loading notes</div>
+  if(isLoading) return <div className="flex flex-col justify-center w-full h-full items-center"><Spinner /></div>
+  if(isError) return <div>Error Loading notes</div>
 
   return (<>
     <div className={`min-h-[100px] dark:bg-gray-900 transition-all w-full duration-300`}>

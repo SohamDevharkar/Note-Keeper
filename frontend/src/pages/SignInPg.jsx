@@ -2,11 +2,9 @@ import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 
-
-export function SignInForm({loginState, setLoginState, isDarkMode, setIsDarkMode}) {
-    const { register, handleSubmit, formState: { errors }, reset} = useForm();
+export function SignInForm() {
+    const { register, handleSubmit, formState: { errors }, reset } = useForm();
     const queryClient = useQueryClient();
     const navigate = useNavigate();
 
@@ -19,11 +17,13 @@ export function SignInForm({loginState, setLoginState, isDarkMode, setIsDarkMode
     // setting up useMutation with signup api
     const { mutate, isLoading, isError, error, isSuccess } = useMutation({
         mutationFn: signinAPI,
-        onSuccess: (data) => { console.log(data.token)
+        onSuccess: (data) => {
+            console.log(data.token)
             sessionStorage.setItem('token', data.token);
-            sessionStorage.setItem('username',data.username);
+            sessionStorage.setItem('username', data.username);
             queryClient.invalidateQueries(['users']);
             navigate('/home')
+
         },
         onError: () => console.log("Failed to create user", error.cause)
     })
@@ -33,11 +33,11 @@ export function SignInForm({loginState, setLoginState, isDarkMode, setIsDarkMode
         mutate(data)
         console.log("should be false on failed login: ", isSuccess)
         reset();
-    
+
     }
 
     return (
-        <div className="fixed inset-0 flex flex-col justify-center items-center
+        <div className="fixed inset-0 flex flex-col justify-center items-center rounded-4xl
             bg-gradient-to-br from-yellow-100 to-orange-200 dark:from-gray-800 dark:to-gray-700">
             <form className="bg-white h-80 w-90 rounded-xl py-2 dark:bg-gray-700"
                 onSubmit={handleSubmit(handleOnSubmit)}>
@@ -45,9 +45,9 @@ export function SignInForm({loginState, setLoginState, isDarkMode, setIsDarkMode
                     Sign In
                 </header>
 
-                <div className="border-2 h-12 mx-6 my-4 rounded-sm">
+                <div className="border rounded-2xl bg-slate-100 h-12 mx-6 my-4">
                     <input type="text" name="email" placeholder="UserName or Email"
-                        className="focus:outline-none text-md font-sans h-full w-full px-2 "
+                        className="focus:outline-none text-md font-sans h-full w-full px-2 rounded-2xl "
                         {...register("email", {
                             required: "Email is a required field.",
                             pattern: {
@@ -59,9 +59,9 @@ export function SignInForm({loginState, setLoginState, isDarkMode, setIsDarkMode
                     {errors.email && <p className={`font-sans text-xs font-light text-red-500 flex justify-center`}>{errors.email.message}</p>}
                 </div>
 
-                <div className="border-2 h-12 mx-6 my-8 rounded-sm">
+                <div className="border-2 h-12 mx-6 my-8 rounded-2xl bg-slate-100">
                     <input type="password" name="password" placeholder="password"
-                        className="focus:outline-none text-md font-sans h-full w-full px-2 "
+                        className="focus:outline-none text-md font-sans h-full w-full px-2 rounded-2xl"
                         {...register("password", {
                             required: "Password is a required field.",
                             minLength: {

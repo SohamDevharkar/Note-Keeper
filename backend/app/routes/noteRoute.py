@@ -176,7 +176,6 @@ def sync_notes(user_id):
             existing_note = None
 
         if existing_note:
-            # Compare timestamps
             if client_note_updated_at > make_aware(existing_note.updated_at):
                 existing_note.title = client_note.get('title', '')
                 existing_note.content = client_note.get('content', { "type": "doc", "content": [] })
@@ -186,7 +185,7 @@ def sync_notes(user_id):
                 existing_note.bgColor = client_note.get('bgColor', 'bg-white')
                 existing_note.updated_at = client_note_updated_at
                 existing_note.client_id = client_note.get('client_id')
-                db.session.add(existing_note)
+                #db.session.add(existing_note)
                 sync_note_ids.add(existing_note.id)
         else:
             # Create new note
@@ -204,8 +203,7 @@ def sync_notes(user_id):
                 client_id = client_note.get('client_id')
             )
             db.session.add(new_note)
-            # SQLAlchemy will auto-generate ID on commit
-            db.session.flush()  # Ensure ID is generated
+            db.session.flush()
             sync_note_ids.add(new_note.id)
 
     try:

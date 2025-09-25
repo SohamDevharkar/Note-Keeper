@@ -3,11 +3,12 @@ import { FiMenu } from "react-icons/fi"
 import { LuSearch } from "react-icons/lu";
 import { FaStickyNote } from "react-icons/fa";
 import { MdArrowBack, MdOutlineGridView } from "react-icons/md";
-import { MdSettings } from "react-icons/md";
 import { MdDarkMode, MdOutlineLightMode } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { TbLayoutList } from "react-icons/tb"; // list view icon
+import { TbLayoutList } from "react-icons/tb"; 
+import { VscSync } from "react-icons/vsc";
+import { VscSyncIgnored } from "react-icons/vsc";
 
 export const Header = ({ 
     sidebaropen, 
@@ -16,10 +17,10 @@ export const Header = ({
     setSearchQuery, 
     view, 
     setView,
-    loginState,
     setLoginState,
     isDarkMode,
-    setIsDarkMode
+    setIsDarkMode,
+    isOnline
 }) => {
 
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -63,8 +64,8 @@ export const Header = ({
     }, [menuOpen])
 
     return (
-        <header className="flex items-center justify-between h-16 w-full px-4 bg-background dark:bg-gray-900 border-b dark:border-gray-700 
-                gap-6 fixed top-0 left-0 right-0 z-10 shadow-sm transition-all duration-300">
+        <header className="flex items-center justify-between h-16 w-full px-4 bg-background dark:bg-gray-900 border-none dark:border-gray-700 
+                gap-6 fixed top-0 left-0 right-0 shadow-sm transition-all duration-300 z-50">
             {/**Left Section */}
             <div className="flex items-center gap-2 min-w-fit">
                 {/** sidebar menu logo div */}
@@ -93,17 +94,13 @@ export const Header = ({
 
             {/** Center section*/}
             {/** search bar visible on md+*/}
-            {/* <div className={`${mobileSearchOpen ? "flex-grow" : "hidden md:flex"} max-w-2xl mx-6 item-center bg-slate-200
-            hover:bg-white focus-within:bg-white border border-transparent focus-within:border-gray-300 rounded-md shadow-sm transition`}
-            > */}
-
             <div className={` ${mobileSearchOpen ? 'flex-grow' : 'hidden md:flex flex-grow md:-translate-x-20'} flex max-w-[600px] items-center
-                             bg-slate-100 hover:bg-white dark:bg-gray-700 dark:hover:bg-slate-600 focus-within:bg-white dark:focus-within:bg-gray-600 border-b
-                             focus-within:border-gray-300 dark:focus-within:border-gray-700 rounded-md transition-all duration-300 shadow-sm`}                             
+                             bg-slate-100 hover:bg-white dark:bg-gray-700 dark:hover:bg-slate-600 focus-within:bg-white dark:focus-within:bg-gray-600 border-none
+                             focus-within:border-gray-300 dark:focus-within:border-gray-700 rounded-2xl transition-all duration-300 shadow-sm`}                             
             >
-                <LuSearch size={28} className="ml-4 text-gray-600 dark:text-gray-200" />
+                <LuSearch size={28} className="ml-2 text-gray-600 dark:text-gray-200" />
                 <input type="search" placeholder="Search"
-                    className="flex-grow px-4 py-2 bg-transparent outline-none text-md dark:text-gray-200  transition-all duration-300"
+                    className="flex-grow px-2 py-2 bg-transparent outline-none text-md placeholder:text-gray-500 dark:placeholder:text-gray-200  transition-all duration-300"
                     autoFocus={mobileSearchOpen} 
                     onChange={(e) => setSearchQuery(e.target.value)}
                     value={searchQuery}
@@ -111,9 +108,8 @@ export const Header = ({
                 />
             </div>
 
-
             {/**Right section*/}
-            <div className={`flex items-center gap-2.5 md:gap-6 justify-between`}>
+            <div className={`flex items-center gap-1.5 md:gap-6 justify-between`}>
                 {/** Mobile Search Icon (only visible when search is closed) */}
                 {!mobileSearchOpen && (
                     <div onClick={() => setMobileSearchOpen(true)}
@@ -121,6 +117,11 @@ export const Header = ({
                         <LuSearch size={28} />
                     </div>
                 )}
+
+                {/**  Sync indicator*/}
+                <div>
+                    {isOnline ? <VscSync size={28}/> : <VscSyncIgnored size={28} />}
+                </div>
 
                 {/** View Toggle */}
                 <div className="rounded-full w-8 h-8 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-gray-700 dark:text-gray-200 transition-all duration-300"
@@ -145,7 +146,7 @@ export const Header = ({
                     {
                         menuOpen && (
                             <div ref={menuRef}
-                                className="absolute flex flex-col justify-center items-center h-90 right-3 top-16  w-[400px] bg-slate-50 dark:bg-gray-900 rounded shadow-lg p-4 text-sm z-50">
+                                className="absolute flex flex-col justify-center items-center h-90 right-3 top-16  w-[400px] bg-slate-50 dark:bg-gray-700 rounded shadow-lg p-4 text-sm z-50 border">
                                     <div className="bg-slate-500 rounded-full h-25 w-25 border-4 -translate-y-16">
                                         <FaUser size={60} className="mx-3.75 my-3.5"/>
                                     
@@ -154,7 +155,7 @@ export const Header = ({
                                             Hello {username.split(" ")[0]}
                                         </div>
                                         <button onClick={()=>handleLogout()}
-                                            className="w-full text-left px-4 py-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 dark:text-gray-200 border-4 transition-all duration-300"
+                                            className="w-full text-left px-4 py-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-900 dark:text-gray-200 border-4 transition-all duration-300"
                                         >
                                         Log Out
                                     </button>

@@ -2,7 +2,6 @@ import { LuSearch } from "react-icons/lu"
 import { NoteLayout } from "../components/my-components/NoteLayout"
 import { useQueryClient } from "@tanstack/react-query";
 import { useFetchAndLoad } from "../hooks/useFetchAndLoad";
-import { useEffect } from "react";
 
 export const SearchView = ({ sidebaropen, searchQuery, setSelectedNote, isOnline }) => {
 
@@ -10,11 +9,11 @@ export const SearchView = ({ sidebaropen, searchQuery, setSelectedNote, isOnline
     const userName = sessionStorage.getItem('username');
     const { data: noteList = [], isLoading, error, isError } = useFetchAndLoad(queryClient, userName, isOnline);
 
-    // useEffect(() => {
-    //     if (data && data.length > 0) {
-    //         setNotes(data);
-    //     }
-    // }, [data, setNotes])
+    if (isLoading) return <div className="flex flex-col justify-center w-full h-full items-center"><Spinner /></div>
+    if (isError) {
+        console.log("Error Loading: ", error);
+        return <div>Error Loading notes</div>
+    }
 
     const filteredNotes = noteList.filter((note) => note.view === 'notes' && (note.title.toLowerCase().includes(searchQuery.toLowerCase())
         || JSON.stringify(note.content).toLowerCase().includes(searchQuery.toLowerCase())))
