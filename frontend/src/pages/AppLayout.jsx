@@ -16,7 +16,6 @@ export const AppLayout = ({
     setSelectedNote,
     showPalette,
     setShowPalette,
-    setLoginState,
     isDarkMode,
     setIsDarkMode,
     isOnline
@@ -41,17 +40,13 @@ export const AppLayout = ({
                     setSearchQuery={setSearchQuery}
                     view={view}
                     setView={setView}
-                    setLoginState={setLoginState}
                     isDarkMode={isDarkMode}
                     setIsDarkMode={setIsDarkMode}
                     isOnline={isOnline}
 
                 />
-                <SidebarBox sidebaropen={sidebaropen}
-                    setSidebarOpen={setSidebarOpen}
-                    isDarkMode={isDarkMode}
-                    setIsDarkMode={setIsDarkMode}
-                />
+                <SidebarBox sidebaropen={sidebaropen}/>
+                
                 <div className={`overflow-auto mt-16 w-full max-w-[1480px] flex-col  ${sidebaropen ? 'ml-56' : 'ml-16'} 
                     scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-white dark:scrollbar-thumb-gray-600 
                     dark:scrollbar-track-gray-900 transition-all duration-300`}>

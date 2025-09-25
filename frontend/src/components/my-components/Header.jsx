@@ -17,7 +17,6 @@ export const Header = ({
     setSearchQuery, 
     view, 
     setView,
-    setLoginState,
     isDarkMode,
     setIsDarkMode,
     isOnline
@@ -35,8 +34,6 @@ export const Header = ({
         sessionStorage.removeItem('username');
         sessionStorage.removeItem('theme')
         document.documentElement.classList.remove('dark')
-       
-        setLoginState(false)
         setMenuOpen(false)
         navigate('/signin')
     }

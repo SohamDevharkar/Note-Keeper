@@ -157,7 +157,6 @@ export const ModalView = ({ selectedNote, setSelectedNote, showPalette, setShowP
                                                 showPalette && <Pallete
                                                     id={selectedNote.client_id}
                                                     setShowPalette={setShowPalette}
-                                                    bgColor={bgColor}           // pass current local color
                                                     setBgColor={setBgColor}
                                                     selectedNote={selectedNote}
                                                     isOnline={isOnline}

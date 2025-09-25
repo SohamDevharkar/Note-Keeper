@@ -16,7 +16,6 @@ import { useBackendStatus } from './hooks/useBackendStatus.js';
 const queryClient = new QueryClient();
 
 function App() {
-  const [loginState, setLoginState] = useState(false);
   const [sidebaropen, setSidebarOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState(null);
   const [inputOpen, setInputOpen] = useState(false);
@@ -66,8 +65,6 @@ function App() {
             setSelectedNote={setSelectedNote}
             showPalette={showPalette}
             setShowPalette={setShowPalette}
-            loginState={loginState}
-            setLoginState={setLoginState}
             isDarkMode={isDarkMode}
             setIsDarkMode={setIsDarkMode}
             isOnline={isOnline}
@@ -80,7 +77,6 @@ function App() {
                   sidebaropen={sidebaropen}
                   setSelectedNote={setSelectedNote}
                   view={view}
-                  setView={setView}
                   isOnline={isOnline}
                 />
               </ProtectedRoutes>
@@ -101,8 +97,6 @@ function App() {
             <Route path='/trash' element={
               <ProtectedRoutes>
                 <TrashView
-                  inputOpen={inputOpen}
-                  setInputOpen={setInputOpen}
                   sidebaropen={sidebaropen}
                   view={view}
                   isOnline={isOnline}

@@ -138,7 +138,7 @@ export const NoteInput = ({inputOpen, setInputOpen, isOnline }) => {
                             </div>
                             {showPalette && (
                                 <Pallete
-                                    id={undefined}
+                                    // works without id
                                     setShowPalette={setShowPalette}
                                     setBgColor={setBgColor}
                                     isOnline={isOnline}
