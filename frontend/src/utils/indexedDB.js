@@ -1,4 +1,5 @@
 import Dexie from 'dexie'
+import { isDev } from './devLoggerUtil';
 
 const db = new Dexie('NotesDatabase');
 
@@ -9,12 +10,12 @@ db.version(7).stores({
 })
 
 db.open().catch((err) => {
-  console.error('Failed to open db:', err.stack || err);
+  if(isDev()){console.error('Failed to open db:', err.stack || err);}
 });
 
-db.on('blocked', () => console.warn('Dexie DB upgrade blocked!'));
-db.on('ready', () => console.log('Dexie DB ready'));
-db.on('populate', () => console.log('Database populated'));
+db.on('blocked', () => {if(isDev()) console.warn('Dexie DB upgrade blocked!')});
+db.on('ready', () => {if(isDev()) console.log('Dexie DB ready')});
+db.on('populate', () => {if(isDev()) console.log('Database populated')});
 
 
 const clearNotes = async () => {

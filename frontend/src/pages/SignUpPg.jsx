@@ -2,6 +2,8 @@ import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios'
 import { useNavigate } from "react-router-dom";
+import { isDev } from "../utils/devLoggerUtil";
+import baseUrl from "../utils/apiConfig";
 
 export function SignUpForm() {
     const { register, handleSubmit, formState: { errors }, reset } = useForm();
@@ -10,7 +12,7 @@ export function SignUpForm() {
 
     // axios data fetcher
     const newUserAPI = async (userData) => {
-        const response = await axios.post('http://127.0.0.1:5000/auth/signup', userData);
+        const response = await axios.post(`${baseUrl}/auth/signup`, userData);
         return response.data;
     }
 
@@ -23,11 +25,11 @@ export function SignUpForm() {
 
         },
 
-        onError: () => console.log("Failed to create user", error)
+        onError: () => {if(isDev()) console.warn("Failed to create user", error)}
     })
 
     const handleOnSubmit = (data) => {
-        console.log("sign up data: ", JSON.stringify(data));
+        if(isDev()){console.log("sign up data: ", JSON.stringify(data));}
         mutate(data);
         reset();
         

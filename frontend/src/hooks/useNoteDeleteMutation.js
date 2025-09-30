@@ -2,6 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { db } from "../utils/indexedDB";
 import axios from "axios";
 import { enqueueMutation } from "../utils/mutationQueue";
+import { isDev } from "../utils/devLoggerUtil";
+import baseUrl from "../utils/apiConfig";
 
 const deleteApi = async (noteToDelete) => {
     const token = sessionStorage.getItem('token');
@@ -9,8 +11,8 @@ const deleteApi = async (noteToDelete) => {
     if (!token) throw new Error("Token not found");
 
     try {
-        console.log("Sending to backend: ", deletedNote)
-        const response = await axios.post(`http://127.0.0.1:5000/api/v1/notes/sync`,
+        if(isDev()){console.log("Sending to backend: ", deletedNote)}
+        const response = await axios.post(`${baseUrl}/api/v1/notes/sync`,
             { notes: [deletedNote] },
             {
                 headers: {
@@ -19,11 +21,9 @@ const deleteApi = async (noteToDelete) => {
             }
         )
         const confirmedNote = response.data || []
-        // await db.notes.delete(deletedNote.id);
-        // console.log(`Deleted note with id ${deletedNote.id} from IndexedDB`);
         return [...confirmedNote];
     } catch (error) {
-        console.error('Failed to sync delete note, saving as "deleted:', error);
+        if(isDev()){console.error('Failed to sync delete note, saving as "deleted:', error);}
         await db.notes.put(deletedNote);
         throw error;
     }
@@ -33,7 +33,7 @@ export const useNoteDeleteMutation = (userName, queryClient, isOnline) => {
     const mutation = useMutation({
         mutationFn: deleteApi,
         onMutate: async (targetNote) => {
-            console.log("target note for deletion: ", targetNote);
+            if(isDev()){console.log("target note for deletion: ", targetNote);}
             await queryClient.cancelQueries(['notes', userName])
 
             const optimisticNote = {
@@ -43,7 +43,7 @@ export const useNoteDeleteMutation = (userName, queryClient, isOnline) => {
             }
 
             // const updatedNotes = previousNotes?.filter((note) => note.id !== targetNote.id);
-            console.log("delete optimistic note: ", optimisticNote);
+            if(isDev()){console.log("delete optimistic note: ", optimisticNote);}
             await db.notes.put(optimisticNote)
 
             queryClient.setQueryData(['notes', userName], (prevNotes = []) => {
@@ -53,7 +53,7 @@ export const useNoteDeleteMutation = (userName, queryClient, isOnline) => {
             const previousNotes = queryClient.getQueryData(['notes', userName]);
 
             if (!isOnline) {
-                console.log("isOnline status for delete: ",isOnline )
+                if(isDev()){console.log("isOnline status for delete: ",isOnline )}
                 await enqueueMutation('delete', optimisticNote)
             }
             return { optimisticNote, previousNotes }
@@ -62,13 +62,13 @@ export const useNoteDeleteMutation = (userName, queryClient, isOnline) => {
             const confirmedNote = Array.isArray(response)
                 ? response.find(n => n.client_id === context.optimisticNote.client_id)
                 : context.optimisticNote;
-            console.log('checking confirmed note:', confirmedNote);
+            if(isDev()){console.log('checking confirmed note:', confirmedNote);}
             await db.notes.delete(confirmedNote.id);
 
             queryClient.setQueryData(['notes', userName], (prev = []) => prev.filter(n => n.client_id !== confirmedNote.client_id))
         },
         onError: async (error, deletedNote, context) => {
-            console.warn("Delete failed, keeping note as marked as deleted: ", error);
+            if(isDev()){console.warn("Delete failed, keeping note as marked as deleted: ", error);}
             const fallbackNote = {
                 ...context.optimisticNote,
                 sync_status: 'deleted',

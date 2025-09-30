@@ -7,6 +7,7 @@ import { MdFormatColorText } from "react-icons/md";
 import { Pallete } from "./Pallete";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNoteUpdateMutation } from "../../hooks/useNoteUpdateMutation";
+import { isDev } from "../../utils/devLoggerUtil";
 
 export const ModalView = ({ selectedNote, setSelectedNote, showPalette, setShowPalette, isOnline }) => {
     const [title, setTitle] = useState(selectedNote.title)
@@ -94,7 +95,8 @@ export const ModalView = ({ selectedNote, setSelectedNote, showPalette, setShowP
             updated_at: new Date().toISOString(),
             sync_status: 'pending'
         };
-        console.log("Submitting updated note:", updatedNote);
+        if(isDev()) {console.log("Submitting updated note:", updatedNote)} 
+        
 
         updateNoteMutation.mutate(updatedNote);
         closeModal();
@@ -179,7 +181,8 @@ export const ModalView = ({ selectedNote, setSelectedNote, showPalette, setShowP
                         </div>
                         <button title="Submit" className="text-sm px-3 mx-10 w-18 py-1 my-1 bg-gray-100 
                                 hover:bg-gray-200 dark:text-gray-200  dark:bg-gray-600 dark:hover:bg-green-400 rounded"  onClick={() => {
-                                console.log("SelectedNote: " + JSON.stringify(selectedNote))
+                                if(isDev()) {console.log("SelectedNote: " + JSON.stringify(selectedNote))}
+                                
                                 handleSubmit({ ...selectedNote, title, content })
                             }}>
                             Submit

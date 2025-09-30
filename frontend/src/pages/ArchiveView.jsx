@@ -3,6 +3,7 @@ import { NoteLayout } from "../components/my-components/NoteLayout"
 import { useQueryClient } from "@tanstack/react-query";
 import { useFetchAndLoad } from "../hooks/useFetchAndLoad";
 import { Spinner } from "../components/my-components/Loader";
+import { isDev } from "../utils/devLoggerUtil";
 
 export const ArchiveView = ({
     sidebaropen,
@@ -17,7 +18,7 @@ export const ArchiveView = ({
 
 
     const filteredArchiveNotes = noteList.filter((note) => note.view === 'archive');
-    console.log(`archived view for ${userName}: ` + JSON.stringify(filteredArchiveNotes));
+    if(isDev()){console.log(`archived view for ${userName}: ` + JSON.stringify(filteredArchiveNotes));}
 
     function isArrayNullOrEmpty(filteredArchiveNotes) {
         return filteredArchiveNotes === null || 
@@ -26,10 +27,10 @@ export const ArchiveView = ({
             filteredArchiveNotes.length === 0);
     }
 
-    console.log("isArrayNullOrEmpty: " + isArrayNullOrEmpty(filteredArchiveNotes));
+    if(isDev()){console.log("isArrayNullOrEmpty: " + isArrayNullOrEmpty(filteredArchiveNotes));}
 
     if(isLoading) return <div className="flex flex-col justify-center w-full h-full items-center"><Spinner /></div>
-    if(isError) return <div>Error Loading archived notes...</div>
+    if(isError) return <div className="flex flex-col justify-center w-full h-full items-center">Error Loading archived notes...</div>
 
     return <div className={`${isArrayNullOrEmpty(filteredArchiveNotes) ? 'fixed' : ''}  h-full sm:w-full`}>
         {

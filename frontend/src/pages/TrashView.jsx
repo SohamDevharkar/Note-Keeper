@@ -3,6 +3,7 @@ import { NoteLayout } from "../components/my-components/NoteLayout";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFetchAndLoad } from "../hooks/useFetchAndLoad";
 import { Spinner } from "../components/my-components/Loader";
+import { isDev } from "../utils/devLoggerUtil";
 
 export const TrashView = ({
     sidebaropen,
@@ -19,11 +20,11 @@ export const TrashView = ({
         return filteredTrashNotes === null || filteredTrashNotes === undefined || (Array.isArray(filteredTrashNotes) && filteredTrashNotes.length === 0);
     }
 
-    console.log("isArrayNullOrEmpty: " + isArrayNullOrEmpty(filteredTrashNotes));
+    if(isDev()){console.log("isArrayNullOrEmpty: " + isArrayNullOrEmpty(filteredTrashNotes));}
 
     if (isLoading) return <div className="flex flex-col justify-center w-full h-full items-center"><Spinner/></div>
     if (isError){
-        console.log("Error Loading: ", error);
+        if(isDev()){console.log("Error Loading: ", error);}
         return <div>Error Loading notes</div>
     } 
 

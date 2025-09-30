@@ -2,11 +2,13 @@ import { useMutation } from "@tanstack/react-query";
 import { db } from "../utils/indexedDB";
 import axios from "axios";
 import { enqueueMutation } from "../utils/mutationQueue";
+import { isDev } from "../utils/devLoggerUtil";
+import baseUrl from "../utils/apiConfig";
 
 const createNoteApi = async (noteData) => {
-    console.log('hitting backend create note')
+    if(isDev()){console.log('hitting backend create note')}
     const token = sessionStorage.getItem('token');
-    console.log('noteData client_id before hitting backend: ', noteData?.client_id);
+    if(isDev()){console.log('noteData client_id before hitting backend: ', noteData?.client_id);}
     const noteToSave = {
         ...noteData,
         updated_at: new Date().toISOString(),
@@ -18,20 +20,20 @@ const createNoteApi = async (noteData) => {
     }
 
     try {
-        console.log("hitting backend create note");
-        const response = await axios.post('http://127.0.0.1:5000/api/v1/notes/sync',
+        if(isDev()){console.log("hitting backend create note");}
+            const response = await axios.post(`${baseUrl}/api/v1/notes/sync`,
             { notes: [noteToSave] },
             {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
-        console.log("api response: " , response);
+        if(isDev()){console.log("api response: " , response);}
         const backendNotes = response.data|| [];
         return [...backendNotes];
 
     } catch (error) {
-        console.error('Error in createNoteApi:', error);
+        if(isDev()){console.error('Error in createNoteApi:', error);}
         const pendingNote = { ...noteToSave, sync_status: 'pending' };
         await db.notes.put(pendingNote);
         throw error;
@@ -61,7 +63,7 @@ export const useCreateNoteMutation = (userName, queryClient, isOnline) => {
             })
 
             if(!isOnline) {
-                console.log("isOnline value for creating: ", isOnline)
+                if(isDev()){console.log("isOnline value for creating: ", isOnline)}
                 await enqueueMutation('create', optimisticNote)
             }
 
@@ -83,7 +85,7 @@ export const useCreateNoteMutation = (userName, queryClient, isOnline) => {
 
         },
         onError: (error, variables, context) => {
-            console.warn('Mutation failed. Keeping note with pending status.', error);
+            if(isDev()){console.warn('Mutation failed. Keeping note with pending status.', error);}
             queryClient.setQueryData(['notes', userName], (prevNotes = []) => {
                 const filtered = prevNotes.filter(n => n.client_id !== context.optimisticNote.client_id);
                 const appendedNoteList = [...filtered, context.optimisticNote];

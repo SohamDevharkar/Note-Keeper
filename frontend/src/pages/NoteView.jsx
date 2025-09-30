@@ -3,6 +3,7 @@ import { NoteLayout } from "../components/my-components/NoteLayout"
 import { useQueryClient} from "@tanstack/react-query"
 import { useFetchAndLoad } from "../hooks/useFetchAndLoad"
 import { Spinner } from "../components/my-components/Loader"
+import { isDev } from "../utils/devLoggerUtil"
 
 export const NoteView = ({ sidebaropen,
   inputOpen,
@@ -12,7 +13,7 @@ export const NoteView = ({ sidebaropen,
   isOnline
 }) => {
   
-  console.count("NoteView rendered");
+  if(isDev()){console.count("NoteView rendered");}
   const queryClient = useQueryClient()
   const userName = sessionStorage.getItem('username');
   const {data: noteList = [], isLoading, error, isError} = useFetchAndLoad(queryClient, userName, isOnline);

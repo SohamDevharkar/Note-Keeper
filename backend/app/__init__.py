@@ -9,13 +9,14 @@ from .errors.errorHandlers import register_error_handlers
 from .models.users import Users
 from .models import notes
 from werkzeug.security import generate_password_hash
+import logging
 
-
+logger = logging.getLogger(__name__)
 
 def create_app() :
     app=Flask(__name__)
     app.config.from_object(Config) #Load config from config.py
-    CORS(app, origins=["http://localhost:5173"])
+    CORS(app, origins=app.config['CORS_ORIGIN'])
     app.register_blueprint(auth_bp)
     app.register_blueprint(notes_bp)
     app.register_blueprint(ping_bp)
@@ -49,8 +50,8 @@ def seed_user():
         )
         db.session.add(demo_user)
         db.session.commit()
-        print("Demo User added")
+        logger.info("Demo User added")
     else: 
-        print("Demo user already exist")
+        logger.info("Demo user already exist")
         
     

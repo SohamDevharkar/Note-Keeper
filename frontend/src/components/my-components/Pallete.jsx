@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useNoteUpdateMutation } from "../../hooks/useNoteUpdateMutation";
+import { isDev } from "../../utils/devLoggerUtil";
 
 export const Pallete = ({ id, setShowPalette, setBgColor, isOnline, selectedNote}) => {
     
@@ -28,7 +29,7 @@ export const Pallete = ({ id, setShowPalette, setBgColor, isOnline, selectedNote
         }
 
         if(setBgColor) {
-            console.log("changing bgcolor for either modal or noteinput.");
+            if(isDev()) {console.log("changing bgcolor for either modal or noteinput.");}
             setBgColor(targetColor);
         }
 

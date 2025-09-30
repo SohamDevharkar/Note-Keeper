@@ -41,7 +41,6 @@ export const SidebarBox = ({ sidebaropen}) => {
                         className="flex items-center gap-4 px-5 py-3 dark:hover:bg-slate-600
                         hover:bg-slate-200 rounded-2xl h-14 relative 
                             transaction-all duration-300">
-                        {/* {console.log(item.title)} */}
                         <a href={item.url}>
                             <item.icon size={26} className="text-gray-700 dark:text-gray-200" />
                         </a>

@@ -4,6 +4,7 @@ import { SidebarBox } from "../components/my-components/Sidebar"
 import { ModalView } from "../components/my-components/ModalView"
 import { useEffect } from "react"
 import { processMutationQueue } from "../utils/mutationQueue"
+import { isDev } from "../utils/devLoggerUtil"
 
 export const AppLayout = ({
     sidebaropen,
@@ -23,7 +24,7 @@ export const AppLayout = ({
 
     useEffect(() => {
         if (isOnline && sessionStorage.getItem('token')) {
-            console.log('Backend reachable, syncing mutation queue...');
+            if(isDev()){console.log('Backend reachable, syncing mutation queue...');}
             processMutationQueue()
         } else {
             alert('You are working in offline mode!!')

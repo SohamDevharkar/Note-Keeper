@@ -2,6 +2,8 @@ import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import { isDev } from "../utils/devLoggerUtil";
+import baseUrl from "../utils/apiConfig";
 
 export function SignInForm() {
     const { register, handleSubmit, formState: { errors }, reset } = useForm({
@@ -14,8 +16,8 @@ export function SignInForm() {
     const navigate = useNavigate();
 
     const signinAPI = async (userData) => {
-        const response = await axios.post('http://127.0.0.1:5000/auth/signin', userData);
-        console.log("response.data: " + JSON.stringify(response.data))
+        const response = await axios.post(`${baseUrl}/auth/signin`, userData);
+        if(isDev()){console.log("response.data: " + JSON.stringify(response.data))}
         return response.data;
     }
 
@@ -23,20 +25,20 @@ export function SignInForm() {
     const { mutate, isLoading, isError, error, isSuccess } = useMutation({
         mutationFn: signinAPI,
         onSuccess: (data) => {
-            console.log(data.token)
+            if(isDev()){console.log(data.token)}
             sessionStorage.setItem('token', data.token);
             sessionStorage.setItem('username', data.username);
             queryClient.invalidateQueries(['users']);
             navigate('/home')
 
         },
-        onError: () => console.log("Failed to create user", error.cause)
+        onError: () => {if(isDev()) {console.warn("Failed to create user", error.cause)}}
     })
 
     const handleOnSubmit = (data) => {
-        console.log("Sign in data: " + JSON.stringify(data));
+        if(isDev()){console.log("Sign in data: " + JSON.stringify(data));}
         mutate(data)
-        console.log("should be false on failed login: ", isSuccess)
+        if(isDev()){console.log("should be false on failed login: ", isSuccess)}
         reset();
 
     }

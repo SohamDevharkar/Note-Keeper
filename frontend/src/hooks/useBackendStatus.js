@@ -1,7 +1,9 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { isDev } from "../utils/devLoggerUtil";
+import baseUrl from "../utils/apiConfig"
 
-export function useBackendStatus(pingUrl = 'http://127.0.0.1:5000/api/v1/ping') {
+export function useBackendStatus(pingUrl = `${baseUrl}/api/v1/ping`) {
     const [isOnline, setIsOnline] = useState(navigator.onLine);
 
     useEffect(() => {
@@ -24,7 +26,7 @@ export function useBackendStatus(pingUrl = 'http://127.0.0.1:5000/api/v1/ping') 
                 } catch (error) {
                     if (isOnline) setIsOnline(false);
                 }
-                console.log("Backend status (isOnline): ", isOnline);
+                if(isDev()){console.log("Backend status (isOnline): ", isOnline);}
             }
         }
         checkBackend();

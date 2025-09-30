@@ -2,12 +2,14 @@ import { useMutation } from "@tanstack/react-query";
 import { db } from "../utils/indexedDB";
 import axios from "axios";
 import { enqueueMutation } from "../utils/mutationQueue";
+import { isDev } from "../utils/devLoggerUtil";
+import baseUrl from "../utils/apiConfig";
 
 const updateNoteApi = async (updatedNote) => {
     //for testing
-    console.log("updateNoteApi received:", updatedNote);
+    if(isDev()){console.log("updateNoteApi received:", updatedNote);}
     const token = sessionStorage.getItem('token');
-    console.log('updatedNote before hitting backend: ')
+    if(isDev()){console.log('updatedNote before hitting backend: ')}
     const updatedNoteToSave = {
         ...updatedNote,
         updated_at: new Date().toISOString(),
@@ -18,8 +20,8 @@ const updateNoteApi = async (updatedNote) => {
     }
 
     try {
-        console.log("Hitting backend update note")
-        const response = await axios.post(`http://127.0.0.1:5000/api/v1/notes/sync`,
+        if(isDev()){console.log("Hitting backend update note")}
+        const response = await axios.post(`${baseUrl}/api/v1/notes/sync`,
             { notes: [updatedNoteToSave] },
             {
                 headers: {
@@ -31,7 +33,7 @@ const updateNoteApi = async (updatedNote) => {
         return [...backendNotes];
 
     } catch (error) {
-        console.log("Sync failed. Saving as pending:", error?.message || error);
+        if(isDev()){console.warn("Sync failed. Saving as pending:", error?.message || error);}
         const pendingNote = { ...updatedNoteToSave, sync_status: 'pending' }
         await db.notes.put(pendingNote);
         throw error; //This should trigger onError
@@ -59,17 +61,17 @@ export const useNoteUpdateMutation = (userName, queryClient, isOnline) => {
             })
 
             if (!isOnline) {
-                console.log("isOnline status for updating: ", isOnline);
+                if(isDev()){console.log("isOnline status for updating: ", isOnline);}
                 await enqueueMutation('update', optimisticNote)
             }
 
             return { previousNotes, optimisticNote };
         },
         onSuccess: async (response, _, context) => {
-            console.log("The response in onSuccess: ", response);
+            if(isDev()){console.log("The response in onSuccess: ", response);}
             const confirmedNote = response.find(n => n.client_id === context.optimisticNote.client_id);
-            console.log("The confirmedNote I got: ", confirmedNote);
-            console.log("The optimictic note I got: ", context.optimisticNote)
+            if(isDev()){console.log("The confirmedNote I got: ", confirmedNote);}
+            if(isDev()){console.log("The optimictic note I got: ", context.optimisticNote)}
             const optimisticNote = context.optimisticNote;
 
             await db.notes.update(optimisticNote.id, { ...confirmedNote, sync_status: 'synced' })
@@ -80,7 +82,7 @@ export const useNoteUpdateMutation = (userName, queryClient, isOnline) => {
         },
 
         onError: async (error, _, context) => {
-            console.warn("Update failed,  keeping pending note:", error);
+            if(isDev()){console.warn("Update failed,  keeping pending note:", error);}
             const fallbackNote = {
                 ...context.optimisticNote,
                 sync_status: 'pending',

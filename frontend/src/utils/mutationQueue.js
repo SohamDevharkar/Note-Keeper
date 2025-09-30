@@ -1,13 +1,15 @@
 import axios from "axios";
 import { db } from "./indexedDB";
+import { isDev } from "./devLoggerUtil";
+import baseUrl from "../utils/apiConfig"
 
 export const enqueueMutation = async (type, note) => {
 
     const existingMutations = await db.mutationQueue.where('client_id').equals(note.client_id).toArray();
-    console.log("Existing mutations: ", existingMutations);
+    if(isDev()){console.log("Existing mutations: ", existingMutations);}
 
     if (existingMutations.length > 0) {
-        console.log("updating existing mutation....")
+        if(isDev()){console.log("updating existing mutation....")}
         const [existingMutation] = existingMutations;
         await db.mutationQueue.update(existingMutation.id, {
             type: type,
@@ -16,7 +18,7 @@ export const enqueueMutation = async (type, note) => {
             status: 'pending'
         })
     } else {
-        console.log("creating new mutation....")
+        if(isDev()){console.log("creating new mutation....")}
         await db.mutationQueue.add({
             type: type,
             client_id: note.client_id,
@@ -33,16 +35,15 @@ export const processMutationQueue = async () => {
     // below line added bcz mutation retyring logic pending.
     const pendingMutations = await db.mutationQueue.where('status').notEqual('synced').toArray();
     // const pendingMutations = await db.mutationQueue.toArray();
-    if (pendingMutations.length === 0) {
-        console.log('No mutations to process. Queue is empty.');
+    if (isDev() && pendingMutations.length === 0 ) { console.log('No mutations to process. Queue is empty.');
     }
 
     for (const mutation of pendingMutations) {
 
-        console.log(`updating update_at prop for ${mutation.note.title}`)
+        if(isDev()){console.log(`updating update_at prop for ${mutation.note.title}`)}
         try {
             const pendingNote = { ...mutation.note, updated_at: new Date().toISOString() }
-            const response = await axios.post('http://127.0.0.1:5000/api/v1/notes/sync',
+            const response = await axios.post(`${baseUrl}/api/v1/notes/sync`,
                 { notes: [pendingNote] },
                 {
                     headers: {
@@ -52,10 +53,10 @@ export const processMutationQueue = async () => {
             const confirmedNote = Array.isArray(response.data)
                 ? response.data.find(n => n.client_id === mutation.client_id)
                 : response.data;
-            console.log("confirmedNote received: ", confirmedNote);
+            if(isDev()){console.log("confirmedNote received: ", confirmedNote);}
             // Apply confirmed mutation locally
             if (mutation.type === 'delete') {
-                console.log("actually deleting the note from indexedDB.")
+                if(isDev()){console.log("actually deleting the note from indexedDB.")}
                 await db.notes.delete(pendingNote.id);
 
             } else {
@@ -64,14 +65,14 @@ export const processMutationQueue = async () => {
                 if (!existingNote || new Date(incomingNote.updated_at) > new Date(existingNote.updated_at)) {
                     await db.notes.put(incomingNote);
                 } else {
-                    console.log(`Skipped update: local note is newer than incoming`)
+                    if(isDev()){console.log(`Skipped update: local note is newer than incoming`)}
                 }
             }
             await db.mutationQueue.update(mutation.id, { ...mutation, status: 'synced' });
-            console.log("mutation successful for the ID: ", mutation.id);
+            if(isDev()){console.log("mutation successful for the ID: ", mutation.id);}
             await db.mutationQueue.delete(mutation.id);
         } catch (err) {
-            console.warn(`Failed to sync mutation ${mutation.id}:`, err);
+            if(isDev()){console.warn(`Failed to sync mutation ${mutation.id}:`, err);}
             await db.mutationQueue.update(mutation.id, { ...mutation, status: 'failed' });
         }
     }
