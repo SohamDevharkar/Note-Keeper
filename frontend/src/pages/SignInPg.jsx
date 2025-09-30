@@ -4,7 +4,12 @@ import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 
 export function SignInForm() {
-    const { register, handleSubmit, formState: { errors }, reset } = useForm();
+    const { register, handleSubmit, formState: { errors }, reset } = useForm({
+        defaultValues: {
+            email:  "demo@example.com",
+            password: "demo123"
+        }
+    });
     const queryClient = useQueryClient();
     const navigate = useNavigate();
 
@@ -37,7 +42,7 @@ export function SignInForm() {
     }
 
     return (
-        <div className="fixed inset-0 flex flex-col justify-center items-center rounded-4xl
+        <div className="fixed inset-0 flex flex-col justify-center items-center
             bg-gradient-to-br from-yellow-100 to-orange-200 dark:from-gray-800 dark:to-gray-700">
             <form className="bg-white h-80 w-90 rounded-xl py-2 dark:bg-gray-700"
                 onSubmit={handleSubmit(handleOnSubmit)}>

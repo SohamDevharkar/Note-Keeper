@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { TbLayoutList } from "react-icons/tb"; 
 import { VscSync } from "react-icons/vsc";
 import { VscSyncIgnored } from "react-icons/vsc";
+import { db } from "../../utils/indexedDB";
 
 export const Header = ({ 
     sidebaropen, 
@@ -29,12 +30,14 @@ export const Header = ({
     const menuRef = useRef();
     const route = '/search';
 
-    function handleLogout() {
+    async function handleLogout() {
         sessionStorage.removeItem('token');
         sessionStorage.removeItem('username');
         sessionStorage.removeItem('theme')
         document.documentElement.classList.remove('dark')
         setMenuOpen(false)
+        await db.notes.clear()
+        // await db.mutationQueue.clear();
         navigate('/signin')
     }
 

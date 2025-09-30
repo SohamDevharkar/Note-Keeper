@@ -120,9 +120,9 @@ export function SignUpForm() {
 
 
                 </div>
-                <div>
-                    {isError && <div className={`fonst-sans text-xs font-light text-red-500`}> Error: {error.message}</div>}
-                    {isSuccess && <div className="fonst-sans text-xs font-light bg-green-500">User Created successfullly</div>}
+                <div className="flex flex-col justify-between items-center">
+                    {isError && <div className={`fonst-sans text-xs font-light  text-red-500`}> Error: {error.message}</div>}
+                    {isSuccess && <div className="fonst-sans text-xs font-light text-green-500 ">User Creation successful</div>}
                 </div>
             </form>
         </div>

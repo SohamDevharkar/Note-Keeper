@@ -30,7 +30,8 @@ class Notes(db.Model) :
     user = db.relationship('Users', back_populates='notes')
     
     def __repr__(self):
-        return f'<Note {self.hex_id()}: {self.content[:20]}>'
+        content_preview = str(self.content)[:20] if self.content else "No content"
+        return f'<Note {self.hex_id()}: {content_preview}>'
     
     def hex_id(self):
          # Helper method to get string representation of UUID for display
