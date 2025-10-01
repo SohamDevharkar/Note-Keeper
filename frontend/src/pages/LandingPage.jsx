@@ -42,7 +42,7 @@ export const LandingPage = () => {
         //   src="https://cdn-icons-png.flaticon.com/512/3817/3817031.png"
         src = {NotePadImage}
           alt="notes illustration"
-          className="w-64 md:w-96 mt-10 md:mt-0"
+          className="w-64 md:w-96 mt-10 md:mt-0 hidden sm:block m-4"
         />
       </section>
 

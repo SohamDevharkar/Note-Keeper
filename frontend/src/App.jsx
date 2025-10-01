@@ -8,7 +8,7 @@ import { AppLayout } from './pages/AppLayout.jsx';
 import { SignUpForm } from './pages/SignUpPg.jsx';
 import { SignInForm } from './pages/SignInPg.jsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { LandingPage } from './pages/LandingPage.jsx';
+import { LandingPage } from './pages/LandingPage2.jsx';
 import { ProtectedRoutes } from './components/my-components/ProtectedRoutes.jsx';
 import { useBackendStatus } from './hooks/useBackendStatus.js';
 
