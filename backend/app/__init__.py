@@ -1,6 +1,5 @@
 from flask import Flask
 from flask_cors import CORS
-from .config import Config
 from .extensions import db
 from .routes.auth import auth_bp
 from .routes.noteRoute import notes_bp
@@ -10,12 +9,18 @@ from .models.users import Users
 from .models import notes
 from werkzeug.security import generate_password_hash
 import logging
+from .config import env, DevelopmentConfig, ProductionConfig
 
 logger = logging.getLogger(__name__)
 
 def create_app() :
     app=Flask(__name__)
-    app.config.from_object(Config) #Load config from config.py
+    
+    if env == "production":
+        app.config.from_object(ProductionConfig)
+    else :
+        app.config.from_object(DevelopmentConfig)
+    
     CORS(app, origins=app.config['CORS_ORIGIN'])
     app.register_blueprint(auth_bp)
     app.register_blueprint(notes_bp)
@@ -29,8 +34,6 @@ def create_app() :
         db.create_all()
         
         seed_user()
-    
-    
     
     return app
 
