@@ -12,7 +12,8 @@ db_schema = os.getenv("DB_SCHEMA")
 secret = os.getenv("JWT_SECRET")
 
 class Config:
-    SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{db_username}:{db_password}@{db_host}:{db_port}/{db_schema}'
+    # SQLALCHEMY_DATABASE_URI = f'mysql+pymysql://{db_username}:{db_password}@{db_host}:{db_port}/{db_schema}'
+    SQLALCHEMY_DATABASE_URI=f'postgresql://{db_username}:{db_password}@{db_host}/{db_schema}?sslmode=require&channel_binding=require'
     SQLALCHEMY_TRACK_MODIFICATIONS =False
     SECRET_KEY=f'{secret}'
     
