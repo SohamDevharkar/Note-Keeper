@@ -38,7 +38,7 @@ export const Header = ({
         setMenuOpen(false)
         await db.notes.clear()
         // await db.mutationQueue.clear();
-        navigate('/signin')
+        navigate('/')
     }
 
     useEffect(() => {

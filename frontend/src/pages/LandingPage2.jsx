@@ -109,7 +109,7 @@ export const LandingPage = () => {
 
               <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto lg:mx-0">
                 NoteKeeper is an offline-first application that helps you jot down ideas,
-                organize tasks, and stay productive. Simple. Fast. Sync across devices.
+                organize tasks, and stay productive. Simple and User friendly.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
