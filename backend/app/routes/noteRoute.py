@@ -20,47 +20,6 @@ def make_aware(dt):
 def validate_input(input_field) :
     return input_field if input_field != None else None
 
-# @notes_bp.route('/newNote', methods=['POST'])
-# @token_required
-# def create_note(user_id):
-#     logger.info(f'creating new note for userid: {user_id}')
-#     data= request.get_json()
-#     logger.info(f'received user data: {data}')
-#     new_note = Notes(
-#         user_id=user_id,
-#         title = data.get('title',''),
-#         content = data.get('content',''),
-#         view = data.get('view', 'notes'),
-#         prevView = data.get('prevView', None),
-#         bgColor = data.get('bgColor', 'bg-white'),
-#         pinned = data.get('pinned', False)
-#     )
-#     db.session.add(new_note)
-#     db.session.commit()
-#     logger.info(f'new note created and saved sucessfully.')
-#     return jsonify(new_note.to_dict())
-
-
-# @notes_bp.route('/updateNote/<string:note_id>', methods=['PATCH'])
-# @token_required
-# def update_note(user_id, note_id):
-#     data = request.get_json()
-#     logger.info(f"Payload: {data}")
-#     note = Notes.query.filter_by(user_id = user_id, id=note_id).first_or_404()
-#     for key, value in data.items():
-#         setattr(note, key, value) 
-#     db.session.commit()
-#     return jsonify(note.to_dict())
-
-# @notes_bp.route('/deleteNote/<string:note_id>', methods=['DELETE'])
-# @token_required
-# def delete_note (user_id, note_id):
-#     logger.info(f'Deleting note id: {note_id} for user: {user_id}')
-#     note = Notes.query.filter_by(user_id = user_id, id=note_id).first_or_404()
-#     db.session.delete(note)
-#     db.session.commit()
-#     return jsonify({"message": "Note deleted"}), 204  
-
 @notes_bp.route('')
 @token_required
 def get_notes(user_id):
@@ -74,7 +33,6 @@ def get_notes(user_id):
 def sync_notes(user_id):
     data = request.get_json()
     client_notes = data.get('notes', [])
-    # sync_note_ids = set()
 
     for client_note in client_notes:
         note_id = client_note.get('id')
@@ -128,7 +86,6 @@ def sync_notes(user_id):
                 existing_note.bgColor = client_note.get('bgColor', 'bg-white')
                 existing_note.updated_at = client_note_updated_at
                 existing_note.client_id = client_note.get('client_id')
-                # sync_note_ids.add(existing_note.id)
         else:
             # Create new note
             new_note = Notes(
@@ -146,7 +103,6 @@ def sync_notes(user_id):
             )
             db.session.add(new_note)
             db.session.flush()
-            # sync_note_ids.add(new_note.id)
 
     try:
         db.session.commit()
