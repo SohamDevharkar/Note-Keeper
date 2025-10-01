@@ -53,7 +53,7 @@ export const useNoteUpdateMutation = (userName, queryClient, isOnline) => {
                 sync_status: 'pending'
             }
 
-            await db.notes.put(optimisticNote)
+           await db.notes.update(updatedNote.id, { ...optimisticNote})
             queryClient.setQueryData(['notes', userName], (prev = []) => {
                 const sortedUpdatedList = prev.map(note => note.client_id === optimisticNote.client_id ? optimisticNote : note);
                 return sortedUpdatedList.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
